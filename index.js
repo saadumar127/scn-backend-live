@@ -4,6 +4,7 @@ import axios from "axios";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+dotenv.config();
 
 const SECRET_KEY = "UsmanBay7223@";
 
