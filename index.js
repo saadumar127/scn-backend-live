@@ -4,20 +4,8 @@ import axios from "axios";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+
 dotenv.config();
-
-const SECRET_KEY = "UsmanBay7223@";
-
-// 🔥 MIDDLEWARE (YAHAN)
-app.use((req, res, next) => {
-  const key = req.headers["x-api-key"];
-
-  if (key !== SECRET_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-
-  next();
-});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +17,19 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+const SECRET_KEY = "UsmanBay7223@";
+
+// 🔥 MIDDLEWARE
+app.use((req, res, next) => {
+  const key = req.headers["x-api-key"];
+
+  if (key !== SECRET_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  next();
+});
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL =
