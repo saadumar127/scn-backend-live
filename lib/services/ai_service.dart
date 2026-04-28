@@ -9,12 +9,9 @@ class AiService {
 
   static const String baseUrl = 'https://scn-backend-live.onrender.com';
 
-  static const Map<String, String> _headers = {
+  Map<String, String> get _headers => {
     'Content-Type': 'application/json',
-
-    // Agar backend x-api-key mangta hai to yahan apni backend key rakho.
-    // Better: backend ko public key ke bina allow karo ya Firebase Auth token use karo.
-    'x-api-key': 'YOUR_BACKEND_API_KEY',
+    'x-api-key': 'UsmanBay7223@', // 🔥 apni backend wali key
   };
 
   Future<String> sendChatMessage({
@@ -50,7 +47,6 @@ class AiService {
 
     return reply;
   }
-
   Future<List<Map<String, dynamic>>> getQuizQuestions({
     required String selectedField,
     required String educationLevel,
@@ -65,14 +61,17 @@ class AiService {
         'educationLevel': educationLevel,
       }),
     )
-        .timeout(const Duration(seconds: 30));
+        .timeout(const Duration(seconds: 60));
 
     if (response.statusCode != 200) {
       throw Exception('Quiz failed: ${response.body}');
     }
 
-    final data = jsonDecode(response.body);
-    final rawQuestions = data['questions'];
+    final decoded = jsonDecode(response.body);
+
+    // ✅ Backend agar {questions:[...]} bheje
+    // ✅ ya direct [...] bheje — dono handle honge
+    final rawQuestions = decoded is List ? decoded : decoded['questions'];
 
     if (rawQuestions is List) {
       return rawQuestions.map((e) {
@@ -80,7 +79,7 @@ class AiService {
       }).toList();
     }
 
-    return [];
+    throw Exception('Invalid quiz response: ${response.body}');
   }
 
   Future<Map<String, dynamic>> getQuizResult({

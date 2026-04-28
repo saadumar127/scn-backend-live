@@ -60,12 +60,13 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       setState(() {
         messages.add({'role': 'bot', 'text': reply});
       });
-    } catch (_) {
+    } catch (e) {
+      print("CHAT ERROR: $e"); // 👈 terminal mein error dikhega
+
       setState(() {
         messages.add({
           'role': 'bot',
-          'text':
-          'SCN demo mode: Apna level aur field batao, main basic guidance de sakta hoon.'
+          'text': 'Error: $e',
         });
       });
     } finally {
