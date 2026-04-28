@@ -16,7 +16,6 @@ class FirestoreService {
     return _firestore.collection('users').doc(uid);
   }
 
-  // 🔥 Ensure profile exists
   Future<void> ensureUserProfileExists() async {
     final user = _auth.currentUser;
     final userDoc = _userDoc;
@@ -41,7 +40,6 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // 🔥 Sync auth → firestore
   Future<void> syncCurrentUserToProfile() async {
     final user = _auth.currentUser;
     final userDoc = _userDoc;
@@ -59,7 +57,6 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // 🔥 Save profile data
   Future<void> saveUserProfile({
     required String name,
     required String email,
@@ -80,7 +77,6 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // 🔥 Update profile
   Future<void> updateUserProfile({
     required String name,
     required String email,
@@ -96,7 +92,7 @@ class FirestoreService {
     await userDoc.set({
       'name': name,
       'email': email,
-      'photoUrl': user.photoURL ?? '',
+      'photoUrl': _auth.currentUser?.photoURL ?? '',
       'provider': user.providerData.isNotEmpty
           ? user.providerData.first.providerId
           : 'unknown',
@@ -104,12 +100,17 @@ class FirestoreService {
     }, SetOptions(merge: true));
   }
 
-  // 🔥 SAVE QUIZ RESULT (FINAL)
   Future<void> saveQuizResult({
     required String educationLevel,
     required String selectedField,
     required String recommendedField,
     required List<Map<String, dynamic>> rankedFields,
+    String shortReason = '',
+    String careerDirection = '',
+    String nextStep = '',
+    int matchPercent = 0,
+    List<Map<String, dynamic>> alternatives = const [],
+    Map<String, dynamic> scoreSummary = const {},
   }) async {
     final userDoc = _userDoc;
     if (userDoc == null) return;
@@ -118,12 +119,17 @@ class FirestoreService {
       'educationLevel': educationLevel,
       'selectedField': selectedField,
       'recommendedField': recommendedField,
+      'shortReason': shortReason,
+      'careerDirection': careerDirection,
+      'nextStep': nextStep,
+      'matchPercent': matchPercent,
       'rankedFields': rankedFields,
+      'alternatives': alternatives,
+      'scoreSummary': scoreSummary,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
-  // 🔥 SAVE CHAT HISTORY (FINAL)
   Future<void> saveChatMessage({
     required String educationLevel,
     required String selectedField,
@@ -142,43 +148,44 @@ class FirestoreService {
     });
   }
 
-  // 🔥 PROFILE STREAM
   Stream<Map<String, dynamic>?> getUserProfileStream() {
     final userDoc = _userDoc;
-    if (userDoc == null) {
-      return Stream.value(null);
-    }
+    if (userDoc == null) return Stream.value(null);
 
     return userDoc.snapshots().map((doc) => doc.data());
   }
 
-  // 🔥 QUIZ HISTORY STREAM
   Stream<List<Map<String, dynamic>>> getQuizHistoryStream() {
     final userDoc = _userDoc;
-    if (userDoc == null) {
-      return Stream.value([]);
-    }
+    if (userDoc == null) return Stream.value([]);
 
     return userDoc
         .collection('quizResults')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-        snapshot.docs.map((doc) => doc.data()).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
   }
 
-  // 🔥 CHAT HISTORY STREAM
   Stream<List<Map<String, dynamic>>> getChatHistoryStream() {
     final userDoc = _userDoc;
-    if (userDoc == null) {
-      return Stream.value([]);
-    }
+    if (userDoc == null) return Stream.value([]);
 
     return userDoc
         .collection('chatHistory')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-        snapshot.docs.map((doc) => doc.data()).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
   }
 }

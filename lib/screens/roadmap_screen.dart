@@ -3,197 +3,76 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import '../services/ai_service.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/glass_card.dart';
 
-class RoadmapScreen extends StatelessWidget {
+class RoadmapScreen extends StatefulWidget {
   static const String routeName = '/roadmap';
 
   const RoadmapScreen({super.key});
 
-  String _clean(String value) => value.trim().toLowerCase();
+  @override
+  State<RoadmapScreen> createState() => _RoadmapScreenState();
+}
 
-  int _semesterCount(String program) {
-    final p = _clean(program);
+class _RoadmapScreenState extends State<RoadmapScreen> {
+  bool isLoading = true;
+  String? errorMessage;
 
-    if (p.contains('mbbs')) return 10;
-    if (p.contains('bds')) return 8;
-    if (p.contains('pharm') || p.contains('pharmacy')) return 10;
-    if (p.contains('dpt') || p.contains('physiotherapy')) return 10;
-    if (p.contains('dvm') || p.contains('veterinary')) return 10;
-    if (p.contains('architecture')) return 10;
-    if (p.contains('llb') || p.contains('law')) return 10;
-    if (p.contains('engineering')) return 8;
-    if (p.contains('nursing')) return 8;
-    if (p.contains('computer') ||
-        p.contains('software') ||
-        p.contains('data') ||
-        p.contains('artificial') ||
-        p.contains('cyber')) {
-      return 8;
+  String program = 'Software Engineering';
+  String field = 'General';
+  String educationLevel = 'Unknown';
+  String roadmapText = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final args =
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    program = (args?['chosenPath'] ??
+        args?['program'] ??
+        args?['field'] ??
+        args?['selectedField'] ??
+        'Software Engineering')
+        .toString();
+
+    field = (args?['field'] ?? args?['selectedField'] ?? program).toString();
+    educationLevel = (args?['educationLevel'] ?? 'Unknown').toString();
+
+    if (roadmapText.isEmpty && isLoading) {
+      _loadRoadmap();
     }
-    if (p.contains('bba') ||
-        p.contains('business') ||
-        p.contains('finance') ||
-        p.contains('accounting')) {
-      return 8;
-    }
-
-    return 8;
   }
 
-  List<String> _semesterTasks(String program, int semester) {
-    final p = _clean(program);
+  Future<void> _loadRoadmap() async {
+    try {
+      final result = await AiService.instance.generateRoadmap(
+        chosenPath: program,
+        field: field,
+        educationLevel: educationLevel,
+      );
 
-    if (p.contains('mbbs')) {
-      return [
-        'Study anatomy, physiology, and biochemistry concepts',
-        'Build strong medical terminology and note-making habits',
-        'Focus on practicals, viva preparation, and clinical basics',
-        'Revise regularly and prepare for professional exams',
-      ];
+      if (!mounted) return;
+      setState(() {
+        roadmapText = result.trim().isEmpty
+            ? 'No roadmap generated. Please try again.'
+            : result.trim();
+        isLoading = false;
+        errorMessage = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
     }
-
-    if (p.contains('software') || p.contains('computer')) {
-      return [
-        'Learn programming, problem solving, and database concepts',
-        'Build mini projects and improve debugging skills',
-        'Study software engineering, web/mobile development, and APIs',
-        'Create portfolio projects and prepare for internships',
-      ];
-    }
-
-    if (p.contains('artificial') || p.contains('data')) {
-      return [
-        'Strengthen Python, statistics, and data analysis basics',
-        'Practice machine learning and visualization projects',
-        'Work on real datasets and model evaluation',
-        'Build AI portfolio and prepare final year project direction',
-      ];
-    }
-
-    if (p.contains('engineering')) {
-      return [
-        'Build mathematics, physics, and engineering fundamentals',
-        'Practice labs, drawings, tools, and technical reports',
-        'Work on discipline-specific projects and software tools',
-        'Prepare for internship, industry skills, and final project',
-      ];
-    }
-
-    if (p.contains('bba') || p.contains('business') || p.contains('finance')) {
-      return [
-        'Study management, economics, accounting, and communication',
-        'Practice presentations, reports, and case studies',
-        'Build Excel, marketing, finance, and business analysis skills',
-        'Prepare for internship, CV, and professional networking',
-      ];
-    }
-
-    return [
-      'Build strong basics of the selected field',
-      'Improve communication, research, and practical skills',
-      'Work on assignments, projects, and portfolio material',
-      'Prepare for internships, final project, and future career',
-    ];
   }
 
-  List<String> _careerOutcomes(String program) {
-    final p = _clean(program);
-
-    if (p.contains('mbbs')) {
-      return [
-        'Doctor / Medical Officer',
-        'Specialist after FCPS / Residency',
-        'Medical Researcher',
-        'Hospital or Healthcare Administrator',
-      ];
-    }
-
-    if (p.contains('bds')) {
-      return [
-        'Dentist',
-        'Dental Surgeon',
-        'Orthodontics / Specialization Path',
-        'Private Dental Clinic Owner',
-      ];
-    }
-
-    if (p.contains('pharm') || p.contains('pharmacy')) {
-      return [
-        'Pharmacist',
-        'Clinical Pharmacist',
-        'Pharmaceutical Industry Officer',
-        'Drug Inspector / Regulatory Roles',
-      ];
-    }
-
-    if (p.contains('software') || p.contains('computer')) {
-      return [
-        'Software Engineer',
-        'Web / Mobile App Developer',
-        'Backend / Full Stack Developer',
-        'Freelancer or Startup Founder',
-      ];
-    }
-
-    if (p.contains('artificial')) {
-      return [
-        'AI Engineer',
-        'Machine Learning Engineer',
-        'AI Solution Developer',
-        'Research Assistant in AI',
-      ];
-    }
-
-    if (p.contains('data')) {
-      return [
-        'Data Analyst',
-        'Data Scientist',
-        'Business Intelligence Analyst',
-        'Machine Learning Developer',
-      ];
-    }
-
-    if (p.contains('engineering')) {
-      return [
-        'Field Engineer',
-        'Design Engineer',
-        'Project Engineer',
-        'Technical Consultant',
-      ];
-    }
-
-    if (p.contains('bba') || p.contains('business')) {
-      return [
-        'Business Manager',
-        'Entrepreneur',
-        'Marketing Executive',
-        'Operations Manager',
-      ];
-    }
-
-    if (p.contains('finance') || p.contains('accounting')) {
-      return [
-        'Finance Analyst',
-        'Accountant',
-        'Banking Officer',
-        'Audit Associate',
-      ];
-    }
-
-    return [
-      'Professional Career in Selected Field',
-      'Higher Studies Opportunity',
-      'Government / Private Sector Jobs',
-      'Freelancing or Entrepreneurship Path',
-    ];
-  }
-
-  Future<void> _downloadPdf({
-    required String program,
-    required int totalSemesters,
-  }) async {
+  Future<void> _downloadPdf() async {
     final doc = pw.Document();
 
     doc.addPage(
@@ -229,7 +108,7 @@ class RoadmapScreen extends StatelessWidget {
                   ),
                 ),
                 pw.Text(
-                  'Total Semesters: $totalSemesters',
+                  'Education Level: $educationLevel',
                   style: const pw.TextStyle(
                     color: PdfColors.white,
                     fontSize: 12,
@@ -239,80 +118,11 @@ class RoadmapScreen extends StatelessWidget {
             ),
           ),
           pw.SizedBox(height: 18),
-          ...List.generate(totalSemesters, (index) {
-            final sem = index + 1;
-            final tasks = _semesterTasks(program, sem);
-
-            return pw.Container(
-              margin: const pw.EdgeInsets.only(bottom: 14),
-              padding: const pw.EdgeInsets.all(14),
-              decoration: pw.BoxDecoration(
-                color: PdfColors.grey100,
-                border: pw.Border.all(color: PdfColors.grey400),
-                borderRadius: pw.BorderRadius.circular(10),
-              ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Container(
-                    padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: pw.BoxDecoration(
-                      color: PdfColors.indigo,
-                      borderRadius: pw.BorderRadius.circular(8),
-                    ),
-                    child: pw.Text(
-                      'Semester $sem',
-                      style: pw.TextStyle(
-                        color: PdfColors.white,
-                        fontSize: 15,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  pw.SizedBox(height: 10),
-                  ...tasks.map(
-                        (task) => pw.Padding(
-                      padding: const pw.EdgeInsets.only(bottom: 5),
-                      child: pw.Row(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text('• '),
-                          pw.Expanded(child: pw.Text(task)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-          pw.SizedBox(height: 16),
           pw.Text(
-            'Career Outcomes',
-            style: pw.TextStyle(
-              fontSize: 18,
-              fontWeight: pw.FontWeight.bold,
-            ),
-          ),
-          pw.SizedBox(height: 10),
-          ..._careerOutcomes(program).map(
-                (outcome) => pw.Container(
-              margin: const pw.EdgeInsets.only(bottom: 8),
-              padding: const pw.EdgeInsets.all(10),
-              decoration: pw.BoxDecoration(
-                color: PdfColors.blue50,
-                borderRadius: pw.BorderRadius.circular(8),
-                border: pw.Border.all(color: PdfColors.blue200),
-              ),
-              child: pw.Row(
-                children: [
-                  pw.Text('✓  '),
-                  pw.Expanded(child: pw.Text(outcome)),
-                ],
-              ),
+            roadmapText,
+            style: const pw.TextStyle(
+              fontSize: 12,
+              lineSpacing: 5,
             ),
           ),
         ],
@@ -322,142 +132,126 @@ class RoadmapScreen extends StatelessWidget {
     await Printing.layoutPdf(onLayout: (format) async => doc.save());
   }
 
-  Widget _semesterCard({
-    required int semester,
-    required List<String> tasks,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: GlassCard(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 56,
-              width: 56,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF9333EA),
-                    Color(0xFF38BDF8),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Center(
-                child: Text(
-                  '$semester',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
+  Widget _loadingScreen() {
+    return const Scaffold(
+      backgroundColor: Color(0xFF070018),
+      body: GradientBackground(
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFFC084FC),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _errorScreen() {
+    return Scaffold(
+      backgroundColor: const Color(0xFF070018),
+      body: GradientBackground(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: GlassCard(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Semester $semester',
-                    style: const TextStyle(
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Color(0xFFFCA5A5),
+                    size: 54,
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Roadmap Not Loaded',
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 24,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ...tasks.map(
-                        (task) => Padding(
-                      padding: const EdgeInsets.only(bottom: 7),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.check_circle_rounded,
-                            color: Color(0xFF22C55E),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              task,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  Text(
+                    errorMessage ?? 'Unknown error',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFFEDE9FE),
+                      height: 1.5,
                     ),
+                  ),
+                  const SizedBox(height: 18),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isLoading = true;
+                        errorMessage = null;
+                      });
+                      _loadRoadmap();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF9333EA),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Try Again'),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _careerOutcomeCard(String outcome) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GlassCard(
-        child: Row(
-          children: [
-            Container(
-              height: 44,
-              width: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFF9333EA).withOpacity(0.22),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(
-                Icons.work_rounded,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                outcome,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+
+  List<Map<String, dynamic>> _parseRoadmap(String text) {
+    final sections = <Map<String, dynamic>>[];
+
+    final regex = RegExp(
+      r'(SEMESTER\s+\d+:|BRIDGE REQUIREMENT:|CAREER OUTCOMES:|NEXT STEP:)',
+      caseSensitive: false,
     );
+
+    final matches = regex.allMatches(text).toList();
+
+    for (int i = 0; i < matches.length; i++) {
+      final start = matches[i].start;
+      final end = i + 1 < matches.length ? matches[i + 1].start : text.length;
+
+      final title = matches[i].group(0)!.trim();
+      final content = text
+          .substring(matches[i].end, end)
+          .trim()
+          .split('\n')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      sections.add({
+        'title': title,
+        'items': content,
+      });
+    }
+
+    return sections;
   }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (isLoading) return _loadingScreen();
+    if (errorMessage != null) return _errorScreen();
 
-    final program = (args?['program'] ??
-        args?['field'] ??
-        args?['selectedField'] ??
-        'Software Engineering')
-        .toString();
-
-    final totalSemesters = _semesterCount(program);
-    final outcomes = _careerOutcomes(program);
     final isDesktop = MediaQuery.of(context).size.width >= 850;
-
+    final sections = _parseRoadmap(roadmapText);
     return Scaffold(
       backgroundColor: const Color(0xFF070018),
       appBar: AppBar(
         title: const Text(
           'Career Roadmap',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+          ),
         ),
         backgroundColor: const Color(0xFF070018),
         elevation: 0,
@@ -514,7 +308,7 @@ class RoadmapScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Your Study Roadmap',
+                              'Your AI Study Roadmap',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 25,
@@ -523,8 +317,11 @@ class RoadmapScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              '$program • $totalSemesters semesters',
-                              style: const TextStyle(color: Colors.white70),
+                              '$program • $educationLevel',
+                              style: const TextStyle(
+                                color: Color(0xFFEDE9FE),
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ],
                         ),
@@ -536,7 +333,7 @@ class RoadmapScreen extends StatelessWidget {
                 const SizedBox(height: 22),
 
                 const Text(
-                  'Semester Plan',
+                  'AI Generated Roadmap',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -546,36 +343,95 @@ class RoadmapScreen extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                ...List.generate(totalSemesters, (index) {
-                  final sem = index + 1;
-                  return _semesterCard(
-                    semester: sem,
-                    tasks: _semesterTasks(program, sem),
-                  );
-                }),
+                GlassCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (sections.isEmpty)
+                        Text(
+                          roadmapText,
+                          style: const TextStyle(
+                            color: Color(0xFFEDE9FE),
+                            fontSize: 15,
+                            height: 1.55,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      else
+                        ...sections.map((section) {
+                          final title = section['title'].toString();
+                          final items = List<String>.from(section['items'] as List);
 
-                const SizedBox(height: 18),
+                          final isSpecial = title.toUpperCase().contains('BRIDGE') ||
+                              title.toUpperCase().contains('CAREER') ||
+                              title.toUpperCase().contains('NEXT');
 
-                const Text(
-                  'Career Outcomes',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: isSpecial
+                                    ? const Color(0xFF2D164F)
+                                    : const Color(0xFF16002F),
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: isSpecial
+                                      ? const Color(0xFFC084FC)
+                                      : const Color(0xFF4C1D95),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title.toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ...items.map((item) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle_rounded,
+                                            color: Color(0xFF22C55E),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              item.replaceAll('-', '').trim(),
+                                              style: const TextStyle(
+                                                color: Color(0xFFEDE9FE),
+                                                height: 1.45,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                    ],
                   ),
                 ),
-
-                const SizedBox(height: 14),
-
-                ...outcomes.map(_careerOutcomeCard),
 
                 const SizedBox(height: 26),
 
                 ElevatedButton.icon(
-                  onPressed: () => _downloadPdf(
-                    program: program,
-                    totalSemesters: totalSemesters,
-                  ),
+                  onPressed: _downloadPdf,
                   icon: const Icon(Icons.download_rounded),
                   label: const Text('Download Roadmap PDF'),
                   style: ElevatedButton.styleFrom(
