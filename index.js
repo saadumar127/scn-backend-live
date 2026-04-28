@@ -2852,24 +2852,67 @@ app.post("/roadmap", async (req, res) => {
     const { chosenPath, field, educationLevel } = req.body;
 
     const prompt = `
-Create a simple and practical roadmap for a student in Pakistan.
+You are Smart Career Navigator AI for Pakistani students.
 
-Context:
-- Chosen Path: ${chosenPath || "General Program"}
-- Field: ${field || "General"}
+Generate a complete, structured, semester-wise roadmap.
+
+Student Info:
 - Education Level: ${educationLevel || "Unknown"}
+- Current Background Field: ${field || "General"}
+- Final Career Path: ${chosenPath || "General Program"}
+- Country: Pakistan
 
-Include:
-- admission guidance
-- important skills
-- next steps
-- future growth direction
+STRICT RULES:
+1. Write roadmap in semester blocks only.
+2. If final path is MBBS, generate 10 semesters.
+3. If final path is BDS, generate 8 semesters.
+4. If final path is Pharm-D, DPT, Architecture, LLB, DVM, or Veterinary, generate 10 semesters.
+5. If final path is Engineering, Computer Science, Software Engineering, Artificial Intelligence, Cyber Security, Data Science, BBA, Finance, Accounting, Psychology, Media Studies, English, Education, or International Relations, generate 8 semesters.
+6. Each semester must include:
+   - Main subjects
+   - Skills to learn
+   - Practical work/project
+7. After semester blocks, add CAREER OUTCOMES.
+8. If Current Background Field is Pre-Medical or Medical and Final Career Path is Engineering, Software Engineering, Computer Science, AI, Data Science, Cyber Security, or any engineering field, add BRIDGE REQUIREMENT:
+   - Student must study Basic Mathematics first
+   - Algebra fundamentals
+   - Trigonometry basics
+   - Calculus basics
+   - Physics numerical problem solving
+9. Use simple English.
+10. Do not use markdown symbols like ##, **, or ---.
+11. Return clean text only.
 
-Use English only.
-Keep it step-by-step and easy to understand.
+Output format:
+
+SEMESTER 1:
+- Main Subjects:
+- Skills to Learn:
+- Practical Work:
+
+SEMESTER 2:
+- Main Subjects:
+- Skills to Learn:
+- Practical Work:
+
+Continue until required semesters.
+
+BRIDGE REQUIREMENT:
+- Only include this section if applicable.
+
+CAREER OUTCOMES:
+- Job role 1
+- Job role 2
+- Job role 3
+- Future growth direction
+
+NEXT STEP:
+- Short practical advice for the student
+
+Now generate the roadmap.
 `;
 
-    const roadmap = await askGeminiText(prompt);
+    const roadmap = await askGeminiText(prompt, 3);
 
     res.json({ roadmap });
   } catch (err) {
@@ -2879,7 +2922,8 @@ Keep it step-by-step and easy to understand.
     if (status === 503 || status === 429) {
       return res.status(503).json({
         error: "Roadmap temporarily unavailable",
-        details: "The AI model is busy or quota-limited right now. Please try again later.",
+        details:
+          "The AI model is busy or quota-limited right now. Please try again later.",
       });
     }
 
@@ -2889,7 +2933,6 @@ Keep it step-by-step and easy to understand.
     });
   }
 });
-
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
