@@ -2814,49 +2814,45 @@ JSON structure:
       console.error("AI result suggestion failed:", aiErr.message);
     }
 
+const allPossibleFields = [
+  "BS Software Engineering",
+  "BS Computer Science",
+  "BS Artificial Intelligence",
+  "BS Data Science",
+  "BS Cyber Security",
+  "BS Information Technology",
+  "BS Electrical Engineering",
+  "BS Mechanical Engineering",
+  "BS Civil Engineering",
+  "BS Mechatronics",
+  "BS Architecture",
+  "MBBS",
+  "BDS",
+  "DPT",
+  "Pharm-D",
+  "BS Biotechnology",
+  "BS Nursing",
+  "BS Psychology",
+  "BBA",
+  "BS Accounting & Finance",
+  "BS Economics",
+  "BS Media Studies",
+  "BS English",
+  "BS Education",
+  "BS International Relations",
+];
 
-    const allPossibleFields = [
-      "BS Software Engineering",
-      "BS Computer Science",
-      "BS Artificial Intelligence",
-      "BS Data Science",
-      "BS Cyber Security",
-      "BS Information Technology",
-      "BS Electrical Engineering",
-      "BS Mechanical Engineering",
-      "BS Civil Engineering",
-      "BS Chemical Engineering",
-      "BS Mechatronics",
-      "BS Architecture",
-      "MBBS",
-      "BDS",
-      "DPT",
-      "Pharm-D",
-      "BS Biotechnology",
-      "BS Nursing",
-      "BS Psychology",
-      "BS English",
-      "BS Media Studies",
-      "BS Education",
-      "BBA",
-      "BS Accounting & Finance",
-      "BS Economics",
-      "BS International Relations",
-      "BS Political Science",
-      "BS Sociology",
-    ];
+const usedFields = [
+  ...rankedFields.map((x) => String(x.field).toLowerCase()),
+  String(topField).toLowerCase(),
+];
 
-    const rankedNames = rankedFields.map((item) =>
-      String(item.field || "").toLowerCase()
-    );
-
-    const expandedAlternatives = allPossibleFields
-      .filter((fieldName) => !rankedNames.includes(fieldName.toLowerCase()))
-      .map((fieldName) => ({
-        field: fieldName,
-        reason:
-          "You can explore this field based on your eligibility, interest, and university admission policy.",
-      }));
+const expandedAlternatives = allPossibleFields
+  .filter((f) => !usedFields.includes(f.toLowerCase()))
+  .map((f) => ({
+    field: f,
+    reason: "This is another possible option depending on your marks, eligibility, interest, and university admission policy.",
+  }));
 
     res.json({
       recommendedField:
@@ -2866,10 +2862,7 @@ JSON structure:
         `${topField} matches your quiz answers and interests.`,
       rankedFields,
       scoreSummary: scores,
-      alternatives: [
-        ...(aiSuggestion?.alternatives || []),
-        ...expandedAlternatives,
-      ],
+      alternatives: expandedAlternatives,
       careerDirection:
         aiSuggestion?.careerDirection ||
         "Explore this field roadmap and compare it with related options.",
@@ -2938,13 +2931,21 @@ app.post("/roadmap", async (req, res) => {
 
     3. Continue until SEMESTER ${semesterCount}
 
-    4. After semesters include:
 
-    CAREER OUTCOMES:
-    - Job role 1
-    - Job role 2
-    - Job role 3
-    - Future growth direction
+    IMPORTANT:
+    4. After ALL semesters, you MUST add this exact section:
+
+       CAREER OUTCOMES:
+       - Job role 1
+       - Job role 2
+       - Job role 3
+       - Job role 4
+       - Future growth direction
+
+       NEXT STEP:
+       - Give practical advice for the student
+
+       Do not finish the response before adding CAREER OUTCOMES and NEXT STEP.
 
     5. If student is from Pre-Medical and chooses Engineering or CS:
 
