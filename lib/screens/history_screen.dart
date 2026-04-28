@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../services/firestore_service.dart';
-import '../theme/scn_modern_theme.dart';
+import '../widgets/gradient_background.dart';
+import '../widgets/glass_card.dart';
 
 class HistoryScreen extends StatelessWidget {
   static const String routeName = '/history';
@@ -12,28 +13,17 @@ class HistoryScreen extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x12000000),
-                blurRadius: 18,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
+        child: GlassCard(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 64, color: SCNTheme.primary),
+              Icon(icon, size: 64, color: const Color(0xFFC084FC)),
               const SizedBox(height: 14),
               Text(
                 title,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: SCNTheme.textPrimary,
+                  color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                 ),
@@ -42,7 +32,10 @@ class HistoryScreen extends StatelessWidget {
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: SCNTheme.textSecondary),
+                style: const TextStyle(
+                  color: Color(0xFFEDE9FE),
+                  height: 1.45,
+                ),
               ),
             ],
           ),
@@ -55,59 +48,86 @@ class HistoryScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required IconData icon,
+    String? trailing,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 18,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 54,
-            width: 54,
-            decoration: BoxDecoration(
-              color: SCNTheme.primary.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Icon(icon, color: SCNTheme.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: SCNTheme.textPrimary,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
+        child: GlassCard(
+          child: Row(
+            children: [
+              Container(
+                height: 54,
+                width: 54,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF9333EA),
+                      Color(0xFF38BDF8),
+                    ],
                   ),
+                  borderRadius: BorderRadius.circular(18),
                 ),
-                const SizedBox(height: 5),
+                child: Icon(icon, color: Colors.white),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFEDE9FE),
+                        fontSize: 13,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (trailing != null) ...[
+                const SizedBox(width: 10),
                 Text(
-                  subtitle,
+                  trailing,
                   style: const TextStyle(
-                    color: SCNTheme.textSecondary,
-                    fontSize: 13,
+                    color: Color(0xFF22C55E),
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
+  }
+
+  String _shortDate(dynamic value) {
+    if (value == null) return 'Recent';
+
+    try {
+      final date = value.toDate();
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (_) {
+      return 'Recent';
+    }
   }
 
   Widget _quizTab() {
@@ -117,7 +137,9 @@ class HistoryScreen extends StatelessWidget {
         final items = snapshot.data ?? [];
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFC084FC)),
+          );
         }
 
         if (items.isEmpty) {
@@ -134,11 +156,29 @@ class HistoryScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
 
+            final recommended =
+            (item['recommendedField'] ?? 'Quiz Result').toString();
+            final level = (item['educationLevel'] ?? 'Unknown').toString();
+            final field = (item['selectedField'] ?? 'General').toString();
+            final date = _shortDate(item['createdAt']);
+            final score = item['matchPercent']?.toString();
+
             return _historyCard(
-              title: (item['recommendedField'] ?? 'Quiz Result').toString(),
-              subtitle:
-              '${item['educationLevel'] ?? 'Unknown'} • ${item['selectedField'] ?? 'General'}',
+              title: recommended,
+              subtitle: '$level • $field • $date',
+              trailing: score == null ? null : '$score%',
               icon: Icons.quiz_rounded,
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/roadmap',
+                  arguments: {
+                    'chosenPath': recommended,
+                    'field': field,
+                    'educationLevel': level,
+                  },
+                );
+              },
             );
           },
         );
@@ -153,7 +193,9 @@ class HistoryScreen extends StatelessWidget {
         final items = snapshot.data ?? [];
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFC084FC)),
+          );
         }
 
         if (items.isEmpty) {
@@ -186,25 +228,35 @@ class HistoryScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: SCNTheme.bgLight,
+        backgroundColor: const Color(0xFF070018),
         appBar: AppBar(
-          title: const Text('History'),
-          backgroundColor: SCNTheme.bgLight,
+          title: const Text(
+            'History',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          backgroundColor: const Color(0xFF070018),
           elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
           bottom: const TabBar(
-            labelColor: SCNTheme.primary,
-            unselectedLabelColor: SCNTheme.textSecondary,
+            indicatorColor: Color(0xFFC084FC),
+            labelColor: Colors.white,
+            unselectedLabelColor: Color(0xFFEDE9FE),
             tabs: [
               Tab(text: 'Quiz'),
               Tab(text: 'Chat'),
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _quizTab(),
-            _chatTab(),
-          ],
+        body: GradientBackground(
+          child: TabBarView(
+            children: [
+              _quizTab(),
+              _chatTab(),
+            ],
+          ),
         ),
       ),
     );
