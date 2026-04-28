@@ -2814,6 +2814,50 @@ JSON structure:
       console.error("AI result suggestion failed:", aiErr.message);
     }
 
+
+    const allPossibleFields = [
+      "BS Software Engineering",
+      "BS Computer Science",
+      "BS Artificial Intelligence",
+      "BS Data Science",
+      "BS Cyber Security",
+      "BS Information Technology",
+      "BS Electrical Engineering",
+      "BS Mechanical Engineering",
+      "BS Civil Engineering",
+      "BS Chemical Engineering",
+      "BS Mechatronics",
+      "BS Architecture",
+      "MBBS",
+      "BDS",
+      "DPT",
+      "Pharm-D",
+      "BS Biotechnology",
+      "BS Nursing",
+      "BS Psychology",
+      "BS English",
+      "BS Media Studies",
+      "BS Education",
+      "BBA",
+      "BS Accounting & Finance",
+      "BS Economics",
+      "BS International Relations",
+      "BS Political Science",
+      "BS Sociology",
+    ];
+
+    const rankedNames = rankedFields.map((item) =>
+      String(item.field || "").toLowerCase()
+    );
+
+    const expandedAlternatives = allPossibleFields
+      .filter((fieldName) => !rankedNames.includes(fieldName.toLowerCase()))
+      .map((fieldName) => ({
+        field: fieldName,
+        reason:
+          "You can explore this field based on your eligibility, interest, and university admission policy.",
+      }));
+
     res.json({
       recommendedField:
         aiSuggestion?.recommendedField || topField,
@@ -2822,12 +2866,10 @@ JSON structure:
         `${topField} matches your quiz answers and interests.`,
       rankedFields,
       scoreSummary: scores,
-      alternatives:
-        aiSuggestion?.alternatives ||
-        rankedFields.slice(1, 4).map((item) => ({
-          field: item.field,
-          reason: "This is also a suitable option based on your quiz score.",
-        })),
+      alternatives: [
+        ...(aiSuggestion?.alternatives || []),
+        ...expandedAlternatives,
+      ],
       careerDirection:
         aiSuggestion?.careerDirection ||
         "Explore this field roadmap and compare it with related options.",
@@ -2850,67 +2892,75 @@ JSON structure:
 app.post("/roadmap", async (req, res) => {
   try {
     const { chosenPath, field, educationLevel } = req.body;
+    const path = String(chosenPath || field || "General").toLowerCase();
+
+    let semesterCount = 8;
+
+    if (path.includes("mbbs")) semesterCount = 10;
+    else if (path.includes("bds")) semesterCount = 8;
+    else if (path.includes("pharm") || path.includes("dpt")) semesterCount = 10;
+    else if (path.includes("architecture")) semesterCount = 10;
+    else if (path.includes("llb") || path.includes("law")) semesterCount = 10;
+    else if (path.includes("engineering")) semesterCount = 8;
+    else if (
+      path.includes("computer") ||
+      path.includes("software") ||
+      path.includes("artificial") ||
+      path.includes("data") ||
+      path.includes("cyber")
+    ) semesterCount = 8;
 
     const prompt = `
-You are Smart Career Navigator AI for Pakistani students.
+    You are Smart Career Navigator AI for Pakistani students.
 
-Generate a complete, structured, semester-wise roadmap.
+    Generate a complete, structured, semester-wise roadmap.
 
-Student Info:
-- Education Level: ${educationLevel || "Unknown"}
-- Current Background Field: ${field || "General"}
-- Final Career Path: ${chosenPath || "General Program"}
-- Country: Pakistan
+    Student Info:
+    - Education Level: ${educationLevel || "Unknown"}
+    - Current Background Field: ${field || "General"}
+    - Final Career Path: ${chosenPath || "General Program"}
+    - Country: Pakistan
 
-STRICT RULES:
-1. Write roadmap in semester blocks only.
-2. If final path is MBBS, generate 10 semesters.
-3. If final path is BDS, generate 8 semesters.
-4. If final path is Pharm-D, DPT, Architecture, LLB, DVM, or Veterinary, generate 10 semesters.
-5. If final path is Engineering, Computer Science, Software Engineering, Artificial Intelligence, Cyber Security, Data Science, BBA, Finance, Accounting, Psychology, Media Studies, English, Education, or International Relations, generate 8 semesters.
-6. Each semester must include:
-   - Main subjects
-   - Skills to learn
-   - Practical work/project
-7. After semester blocks, add CAREER OUTCOMES.
-8. If Current Background Field is Pre-Medical or Medical and Final Career Path is Engineering, Software Engineering, Computer Science, AI, Data Science, Cyber Security, or any engineering field, add BRIDGE REQUIREMENT:
-   - Student must study Basic Mathematics first
-   - Algebra fundamentals
-   - Trigonometry basics
-   - Calculus basics
-   - Physics numerical problem solving
-9. Use simple English.
-10. Do not use markdown symbols like ##, **, or ---.
-11. Return clean text only.
+    IMPORTANT:
+    Generate EXACTLY ${semesterCount} semesters.
+    Do not generate less than ${semesterCount} semesters.
+    Do not stop at 4 semesters.
 
-Output format:
+    STRICT RULES:
+    1. Each semester must be labeled:
+    SEMESTER 1:
+    SEMESTER 2:
+    ...
+    2. Each semester must include:
+    - Main Subjects:
+    - Skills to Learn:
+    - Practical Work:
 
-SEMESTER 1:
-- Main Subjects:
-- Skills to Learn:
-- Practical Work:
+    3. Continue until SEMESTER ${semesterCount}
 
-SEMESTER 2:
-- Main Subjects:
-- Skills to Learn:
-- Practical Work:
+    4. After semesters include:
 
-Continue until required semesters.
+    CAREER OUTCOMES:
+    - Job role 1
+    - Job role 2
+    - Job role 3
+    - Future growth direction
 
-BRIDGE REQUIREMENT:
-- Only include this section if applicable.
+    5. If student is from Pre-Medical and chooses Engineering or CS:
 
-CAREER OUTCOMES:
-- Job role 1
-- Job role 2
-- Job role 3
-- Future growth direction
+    BRIDGE REQUIREMENT:
+    - Basic Mathematics
+    - Algebra
+    - Trigonometry
+    - Calculus
+    - Physics numericals
 
-NEXT STEP:
-- Short practical advice for the student
+    6. Use simple English
+    7. No markdown symbols like ## or **
+    8. Clean output only
 
-Now generate the roadmap.
-`;
+    Now generate the roadmap.
+    `;
 
     const roadmap = await askGeminiText(prompt, 3);
 
