@@ -11,7 +11,7 @@ class AiService {
 
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
-    'x-api-key': 'UsmanBay7223@', // 🔥 apni backend wali key
+    'x-api-key': 'UsmanBay7223#', // 🔥 apni backend wali key
   };
 
   Future<String> sendChatMessage({
