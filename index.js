@@ -1,16 +1,9 @@
 import express from "express";
 import cors from "cors";
 import axios from "axios";
-import path from "path";
-import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,28 +11,29 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const SECRET_KEY = "UsmanBay7223@";
+// ✅ Public test route - browser ke liye
+app.get("/", (_req, res) => {
+  res.json({ message: "SCN backend latest test 123" });
+});
 
-// 🔥 MIDDLEWARE
+// ✅ API key middleware - root route ke BAAD
 app.use((req, res, next) => {
   const key = req.headers["x-api-key"];
 
-  if (key !== SECRET_KEY) {
-    return res.status(403).json({ error: "Unauthorized" });
+  if (key !== process.env.BACKEND_API_KEY) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   next();
 });
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL =
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
-/* -----------------------------------
-   HELPERS
------------------------------------ */
+console.log("KEY LAST 6:", API_KEY?.slice(-6));
 
-async function sleep(ms) {
+ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+
+function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -68,8 +62,14 @@ async function askGeminiText(prompt, retries = 3) {
     }
   }
 }
-
-
+/*
+function normalizeField(field) {
+  return String(field || "General").trim();
+}
+*/
+/* -----------------------------------
+   HELPERS
+----------------------------------- */
 
 function normalizeField(field = "") {
   const f = String(field).toLowerCase();
@@ -2689,21 +2689,13 @@ ${message}
 
     res.json({ reply });
   } catch (err) {
-    const status = err?.response?.status;
-    const details = err?.response?.data || err.message || "Unknown error";
+      console.error("Gemini Error:", err?.response?.data || err.message);
 
-    if (status === 503 || status === 429) {
-      return res.status(503).json({
-        error: "Chat temporarily unavailable",
-        details: "The AI model is busy or quota-limited right now. Please try again later.",
+      // 🔥 Fallback reply (demo mode)
+      return res.json({
+        reply: "Gemini temporarily unavailable hai. Lekin main tumhari madad kar sakta hoon 🙂\n\nApna education level (Matric / Intermediate) aur field batao, main guide karta hoon."
       });
     }
-
-    res.status(500).json({
-      error: "Chat failed",
-      details,
-    });
-  }
 });
 
 /* -----------------------------------
@@ -2721,14 +2713,14 @@ app.post("/quiz", async (req, res) => {
         educationLevel || "Unknown"
       );
 
-      return res.json(aiQuiz);
+    return res.json({ questions: aiQuiz });
     } catch (aiError) {
       console.error("AI dynamic quiz failed, using fallback:", aiError.message);
     }
 
     // 2) Fallback to local static bank
     const fallbackQuiz = generateQuizByField(field || "General");
-    return res.json(fallbackQuiz);
+    return res.json({ questions: fallbackQuiz });
   } catch (err) {
     return res.status(500).json({
       error: "Quiz generation failed",
@@ -2740,10 +2732,9 @@ app.post("/quiz", async (req, res) => {
 /* -----------------------------------
    QUIZ RESULT
 ----------------------------------- */
-
 app.post("/quiz-result", async (req, res) => {
   try {
-    const { questions, answers } = req.body;
+    const { questions, answers, educationLevel, selectedField } = req.body;
 
     if (!Array.isArray(questions) || typeof answers !== "object" || answers === null) {
       return res.status(400).json({
@@ -2771,10 +2762,78 @@ app.post("/quiz-result", async (req, res) => {
       .map(([field, score]) => ({ field, score }))
       .sort((a, b) => b.score - a.score);
 
+    const topField = rankedFields[0]?.field || "No Recommendation";
+
+    const prompt = `
+You are Smart Career Navigator AI for Pakistani students.
+
+Student context:
+- Education level: ${educationLevel || "Unknown"}
+- Current field/background: ${selectedField || "General"}
+
+Quiz score summary:
+${JSON.stringify(scores)}
+
+Ranked fields:
+${JSON.stringify(rankedFields)}
+
+Task:
+Based on the quiz result, suggest the best university-level course/field and alternatives.
+
+Return ONLY valid JSON. No markdown. No explanation outside JSON.
+
+JSON structure:
+{
+  "recommendedField": "Best field/course name",
+  "shortReason": "2-3 line reason why this field fits the student",
+  "alternatives": [
+    {
+      "field": "Alternative course 1",
+      "reason": "Short reason"
+    },
+    {
+      "field": "Alternative course 2",
+      "reason": "Short reason"
+    },
+    {
+      "field": "Alternative course 3",
+      "reason": "Short reason"
+    }
+  ],
+  "careerDirection": "Short career direction for the student",
+  "nextStep": "What student should do next"
+}
+`;
+
+    let aiSuggestion = null;
+
+    try {
+      const aiText = await askGeminiText(prompt, 2);
+      aiSuggestion = extractJsonFromText(aiText);
+    } catch (aiErr) {
+      console.error("AI result suggestion failed:", aiErr.message);
+    }
+
     res.json({
-      recommendedField: rankedFields[0]?.field || "No Recommendation",
+      recommendedField:
+        aiSuggestion?.recommendedField || topField,
+      shortReason:
+        aiSuggestion?.shortReason ||
+        `${topField} matches your quiz answers and interests.`,
       rankedFields,
       scoreSummary: scores,
+      alternatives:
+        aiSuggestion?.alternatives ||
+        rankedFields.slice(1, 4).map((item) => ({
+          field: item.field,
+          reason: "This is also a suitable option based on your quiz score.",
+        })),
+      careerDirection:
+        aiSuggestion?.careerDirection ||
+        "Explore this field roadmap and compare it with related options.",
+      nextStep:
+        aiSuggestion?.nextStep ||
+        "Open the roadmap and review semester-wise study plan.",
     });
   } catch (err) {
     res.status(500).json({
@@ -2831,8 +2890,8 @@ Keep it step-by-step and easy to understand.
   }
 });
 
-const PORT = process.env.PORT || port || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`SCN Backend running on port ${PORT}`);
 });
