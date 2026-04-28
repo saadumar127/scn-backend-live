@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "89447583523",
+    "project_id": "scn-app-a784e",
+    "storage_bucket": "scn-app-a784e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89447583523:android:e3995f31b675ea229c0696",
+        "android_client_info": {
+          "package_name": "com.example.scn_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHkW9VrPoAc9r1teGhK13tofllhfuNWTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
