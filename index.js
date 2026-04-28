@@ -43,10 +43,10 @@ async function askGeminiText(prompt, retries = 3) {
       const response = await axios.post(GEMINI_URL, {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.8,
+          temperature: 0.7,
           topP: 0.95,
           topK: 40,
-          maxOutputTokens: 1600,
+          maxOutputTokens: 4096,
         },
       });
 
@@ -2928,6 +2928,11 @@ app.post("/roadmap", async (req, res) => {
     - Main Subjects:
     - Skills to Learn:
     - Practical Work:
+    IMPORTANT:
+    - Keep each semester short.
+    - Maximum 4 bullet points per section.
+    - Do not write long explanations.
+    - Use short and clear phrases only.
 
     3. Continue until SEMESTER ${semesterCount}
 
@@ -2959,6 +2964,15 @@ app.post("/roadmap", async (req, res) => {
     6. Use simple English
     7. No markdown symbols like ## or **
     8. Clean output only
+    FINAL STRICT RULE:
+    You MUST complete all ${semesterCount} semesters.
+    After SEMESTER ${semesterCount}, you MUST add:
+    1. BRIDGE REQUIREMENT (if applicable)
+    2. CAREER OUTCOMES
+    3. NEXT STEP
+
+    Do not stop early.
+    Do not skip sections.
 
     Now generate the roadmap.
     `;
