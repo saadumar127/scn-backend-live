@@ -2882,122 +2882,160 @@ const expandedAlternatives = allPossibleFields
    ROADMAP
 ----------------------------------- */
 
-app.post("/roadmap", async (req, res) => {
-  try {
-    const { chosenPath, field, educationLevel } = req.body;
-    const path = String(chosenPath || field || "General").toLowerCase();
+function generateFallbackRoadmap(chosenPath, field, educationLevel) {
+  const path = String(chosenPath || field || "General").toLowerCase();
 
-    let semesterCount = 8;
+  // 🔹 SOFTWARE / CS
+  if (path.includes("software") || path.includes("cs") || path.includes("computer")) {
+    return `
+SEMESTER 1:
+- Main Subjects: Programming Fundamentals, Mathematics I, English
+- Skills to Learn: Basic coding (C++/Python), logic building
+- Practical Work: Simple programs, mini calculator project
 
-    if (path.includes("mbbs")) semesterCount = 10;
-    else if (path.includes("bds")) semesterCount = 8;
-    else if (path.includes("pharm") || path.includes("dpt")) semesterCount = 10;
-    else if (path.includes("architecture")) semesterCount = 10;
-    else if (path.includes("llb") || path.includes("law")) semesterCount = 10;
-    else if (path.includes("engineering")) semesterCount = 8;
-    else if (
-      path.includes("computer") ||
-      path.includes("software") ||
-      path.includes("artificial") ||
-      path.includes("data") ||
-      path.includes("cyber")
-    ) semesterCount = 8;
+SEMESTER 2:
+- Main Subjects: OOP, Discrete Structures
+- Skills to Learn: OOP concepts, problem solving
+- Practical Work: Console based applications
 
-    const prompt = `
-    You are Smart Career Navigator AI for Pakistani students.
+SEMESTER 3:
+- Main Subjects: Data Structures, Digital Logic Design
+- Skills to Learn: Arrays, linked lists, algorithms
+- Practical Work: Data structure implementations
 
-    Generate a complete, structured, semester-wise roadmap.
+SEMESTER 4:
+- Main Subjects: Database Systems, Operating Systems
+- Skills to Learn: SQL, system concepts
+- Practical Work: Database project
 
-    Student Info:
-    - Education Level: ${educationLevel || "Unknown"}
-    - Current Background Field: ${field || "General"}
-    - Final Career Path: ${chosenPath || "General Program"}
-    - Country: Pakistan
+SEMESTER 5:
+- Main Subjects: Software Engineering, Computer Networks
+- Skills to Learn: SDLC, networking basics
+- Practical Work: Team project
 
-    IMPORTANT:
-    Generate EXACTLY ${semesterCount} semesters.
-    Do not generate less than ${semesterCount} semesters.
-    Do not stop at 4 semesters.
+SEMESTER 6:
+- Main Subjects: Web Development, AI Basics
+- Skills to Learn: HTML, CSS, JS, ML intro
+- Practical Work: Full website project
 
-    STRICT RULES:
-    1. Each semester must be labeled:
-    SEMESTER 1:
-    SEMESTER 2:
-    ...
-    2. Each semester must include:
-    - Main Subjects:
-    - Skills to Learn:
-    - Practical Work:
-    IMPORTANT:
-    - Keep each semester short.
-    - Maximum 4 bullet points per section.
-    - Do not write long explanations.
-    - Use short and clear phrases only.
+SEMESTER 7:
+- Main Subjects: Final Year Project I
+- Skills to Learn: System design
+- Practical Work: FYP start
 
-    3. Continue until SEMESTER ${semesterCount}
+SEMESTER 8:
+- Main Subjects: Final Year Project II
+- Skills to Learn: Deployment, testing
+- Practical Work: Complete project
 
+CAREER OUTCOMES:
+- Software Engineer
+- Web Developer
+- AI Engineer
+- Freelancer
 
-    IMPORTANT:
-    4. After ALL semesters, you MUST add this exact section:
-
-       CAREER OUTCOMES:
-       - Job role 1
-       - Job role 2
-       - Job role 3
-       - Job role 4
-       - Future growth direction
-
-       NEXT STEP:
-       - Give practical advice for the student
-
-       Do not finish the response before adding CAREER OUTCOMES and NEXT STEP.
-
-    5. If student is from Pre-Medical and chooses Engineering or CS:
-
-    BRIDGE REQUIREMENT:
-    - Basic Mathematics
-    - Algebra
-    - Trigonometry
-    - Calculus
-    - Physics numericals
-
-    6. Use simple English
-    7. No markdown symbols like ## or **
-    8. Clean output only
-    FINAL STRICT RULE:
-    You MUST complete all ${semesterCount} semesters.
-    After SEMESTER ${semesterCount}, you MUST add:
-    1. BRIDGE REQUIREMENT (if applicable)
-    2. CAREER OUTCOMES
-    3. NEXT STEP
-
-    Do not stop early.
-    Do not skip sections.
-
-    Now generate the roadmap.
-    `;
-
-    const roadmap = await askGeminiText(prompt, 3);
-
-    res.json({ roadmap });
-  } catch (err) {
-    const status = err?.response?.status;
-    const details = err?.response?.data || err.message || "Unknown error";
-
-    if (status === 503 || status === 429) {
-      return res.status(503).json({
-        error: "Roadmap temporarily unavailable",
-        details:
-          "The AI model is busy or quota-limited right now. Please try again later.",
-      });
-    }
-
-    res.status(500).json({
-      error: "Roadmap failed",
-      details,
-    });
+NEXT STEP:
+- Start coding daily, build portfolio, learn Git & projects.
+`;
   }
-});
+
+  // 🔹 MBBS
+  if (path.includes("mbbs") || path.includes("doctor")) {
+    return `
+SEMESTER 1:
+- Main Subjects: Anatomy, Physiology
+- Skills to Learn: Basic medical concepts
+- Practical Work: Lab work
+
+SEMESTER 2:
+- Main Subjects: Biochemistry
+- Skills to Learn: Chemical processes
+- Practical Work: Lab experiments
+
+SEMESTER 3-5:
+- Main Subjects: Pathology, Pharmacology
+- Skills to Learn: Disease understanding
+- Practical Work: Case studies
+
+SEMESTER 6-10:
+- Main Subjects: Clinical Practice
+- Skills to Learn: Patient handling
+- Practical Work: Hospital rotations
+
+CAREER OUTCOMES:
+- Doctor
+- Surgeon
+- Specialist
+
+NEXT STEP:
+- Focus on medical studies + hospital training.
+`;
+  }
+
+  // 🔹 BUSINESS / BBA
+  if (path.includes("business") || path.includes("bba") || path.includes("commerce")) {
+    return `
+SEMESTER 1:
+- Main Subjects: Principles of Management, Economics
+- Skills to Learn: Communication, basics of business
+- Practical Work: Presentations
+
+SEMESTER 2:
+- Main Subjects: Accounting, Marketing
+- Skills to Learn: Financial basics
+- Practical Work: Case studies
+
+SEMESTER 3-6:
+- Main Subjects: HR, Finance, Marketing
+- Skills to Learn: Leadership, analysis
+- Practical Work: Internships
+
+SEMESTER 7-8:
+- Main Subjects: Business Strategy
+- Skills to Learn: Decision making
+- Practical Work: Final project
+
+CAREER OUTCOMES:
+- Manager
+- Entrepreneur
+- Marketing Specialist
+
+NEXT STEP:
+- Start internships early + build networking.
+`;
+  }
+
+  // 🔹 DEFAULT
+  return `
+SEMESTER 1-2:
+- Main Subjects: Basic foundation subjects
+- Skills to Learn: Communication, critical thinking
+- Practical Work: Assignments
+
+SEMESTER 3-6:
+- Main Subjects: Core field subjects
+- Skills to Learn: Field-specific skills
+- Practical Work: Projects
+
+SEMESTER 7-8:
+- Main Subjects: Advanced topics
+- Skills to Learn: Specialization
+- Practical Work: Final project
+
+CAREER OUTCOMES:
+- Professional in selected field
+
+NEXT STEP:
+- Focus on skills + real-world experience.
+`;
+}
+app.post("/roadmap", (req, res) => {
+   const { chosenPath, field, educationLevel } = req.body;
+
+   res.json({
+     roadmap: generateFallbackRoadmap(chosenPath, field, educationLevel),
+   });
+ });
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
