@@ -2879,68 +2879,217 @@ const expandedAlternatives = allPossibleFields
 });
 
 /* -----------------------------------
-   ROADMAP
+   ROADMAP - COMPLETE SEMESTER SYSTEM
 ----------------------------------- */
 
-function getSemesterCount(path) {
-  const p = String(path || "").toLowerCase();
+function getSemesterCount(path = "") {
+  const p = String(path).toLowerCase();
 
   if (p.includes("mbbs")) return 10;
   if (p.includes("pharm") || p.includes("dpt")) return 10;
   if (p.includes("architecture")) return 10;
-  if (p.includes("llb") || p.includes("law")) return 10;
+  if (p.includes("law") || p.includes("llb")) return 10;
   if (p.includes("bds")) return 8;
 
   return 8;
 }
 
-function fieldData(path) {
-  const p = String(path || "").toLowerCase();
+const roadmapTemplates = {
+  "BS Software Engineering": {
+    main: "BS Software Engineering",
+    semesters: [
+      ["Programming Fundamentals", "Calculus", "English Composition", "ICT"],
+      ["OOP", "Discrete Structures", "Digital Logic", "Communication Skills"],
+      ["Data Structures", "Database Systems", "Computer Organization", "Statistics"],
+      ["Software Engineering", "Operating Systems", "Computer Networks", "Web Engineering"],
+      ["SDA", "Mobile App Development", "HCI", "Software Requirements"],
+      ["SQA", "Cloud Computing", "Cyber Security", "AI Basics"],
+      ["FYP I", "Project Management", "Research Methods", "Professional Practices"],
+      ["FYP II", "Deployment", "Testing", "Entrepreneurship"]
+    ],
+    skills: [
+      ["Basic coding", "Logic building", "Problem solving", "Computer usage"],
+      ["OOP concepts", "Debugging", "Git basics", "Communication"],
+      ["Database design", "DSA", "SQL", "Analytical thinking"],
+      ["Web development", "Networking basics", "OS concepts", "Teamwork"],
+      ["Flutter / Mobile apps", "UI/UX basics", "Requirement analysis", "Design patterns"],
+      ["Testing", "Cloud basics", "Security awareness", "AI understanding"],
+      ["Project planning", "Documentation", "Research", "Presentation"],
+      ["Deployment", "Portfolio", "Final testing", "Job preparation"]
+    ],
+    practical: [
+      ["Console programs", "Flowcharts", "Mini coding tasks", "Lab work"],
+      ["OOP mini project", "GitHub repo", "Class diagrams", "Lab tasks"],
+      ["Database project", "SQL queries", "DSA practice", "ERD"],
+      ["Website project", "Network lab", "OS commands", "API basics"],
+      ["Mobile app", "UI prototype", "SRS document", "Design document"],
+      ["Test cases", "Cloud deployment", "Security report", "AI mini project"],
+      ["FYP proposal", "Prototype", "Literature review", "Sprint planning"],
+      ["Final FYP", "Live deployment", "Viva preparation", "Portfolio"]
+    ],
+    outcomes: ["Software Engineer", "Flutter Developer", "Web Developer", "Backend Developer"]
+  },
 
-  if (p.includes("mbbs") || p.includes("doctor")) {
-    return {
-      title: "MBBS",
-      subjects: [
-        ["Anatomy", "Physiology", "Biochemistry", "English / Communication"],
-        ["Anatomy II", "Physiology II", "Biochemistry II", "Histology"],
-        ["Pathology", "Pharmacology", "Microbiology", "Community Medicine"],
-        ["Pathology II", "Pharmacology II", "Forensic Medicine", "Behavioral Sciences"],
-        ["Medicine Basics", "Surgery Basics", "Clinical Skills", "Community Health"],
-        ["Medicine", "Surgery", "Gynecology", "Pediatrics"],
-        ["ENT", "Ophthalmology", "Clinical Medicine", "Clinical Surgery"],
-        ["Advanced Medicine", "Advanced Surgery", "Emergency Care", "Ward Practice"],
-        ["Clinical Rotation", "Patient Management", "Diagnosis Practice", "Case Studies"],
-        ["Final Clinical Training", "House Job Preparation", "Professional Ethics", "Hospital Practice"],
-      ],
-      skills: ["Patient handling", "Diagnosis", "Medical ethics", "Clinical communication"],
-      practical: ["Lab work", "Case studies", "Hospital rounds", "Clinical practice"],
-      outcomes: ["Doctor", "Medical Officer", "Specialist", "Surgeon"],
-    };
+  "BS Computer Science": {
+    main: "BS Computer Science",
+    base: "computing",
+    outcomes: ["Computer Scientist", "Software Developer", "Systems Analyst", "Research Assistant"]
+  },
+
+  "BS Artificial Intelligence": {
+    main: "BS Artificial Intelligence",
+    base: "ai",
+    outcomes: ["AI Engineer", "ML Engineer", "AI Developer", "Data Scientist"]
+  },
+
+  "BS Data Science": {
+    main: "BS Data Science",
+    base: "data",
+    outcomes: ["Data Analyst", "Data Scientist", "BI Analyst", "ML Assistant"]
+  },
+
+  "BS Cyber Security": {
+    main: "BS Cyber Security",
+    base: "cyber",
+    outcomes: ["Cyber Security Analyst", "SOC Analyst", "Ethical Hacker", "Security Engineer"]
+  },
+
+  "MBBS": {
+    main: "MBBS",
+    semesters: [
+      ["Anatomy I", "Physiology I", "Biochemistry I", "Islamic / Pak Studies"],
+      ["Anatomy II", "Physiology II", "Biochemistry II", "Histology"],
+      ["Pathology I", "Pharmacology I", "Microbiology I", "Community Medicine"],
+      ["Pathology II", "Pharmacology II", "Microbiology II", "Forensic Medicine"],
+      ["Medicine Basics", "Surgery Basics", "Clinical Skills", "Behavioral Sciences"],
+      ["Medicine I", "Surgery I", "Gynecology I", "Pediatrics I"],
+      ["ENT", "Ophthalmology", "Clinical Medicine", "Clinical Surgery"],
+      ["Medicine II", "Surgery II", "Emergency Care", "Ward Practice"],
+      ["Clinical Rotation", "Patient Management", "Diagnosis Practice", "Case Studies"],
+      ["Final Clinical Training", "House Job Preparation", "Medical Ethics", "Hospital Practice"]
+    ],
+    skills: [
+      ["Medical terminology", "Observation", "Basic lab skills", "Discipline"],
+      ["Anatomy understanding", "Human body systems", "Microscopy", "Note making"],
+      ["Disease concepts", "Drug basics", "Lab diagnosis", "Public health"],
+      ["Clinical reasoning", "Medicine safety", "Forensic awareness", "Ethics"],
+      ["Patient communication", "Clinical examination", "History taking", "Teamwork"],
+      ["Diagnosis basics", "Treatment planning", "Ward discipline", "Case discussion"],
+      ["ENT examination", "Eye examination", "Clinical confidence", "Patient care"],
+      ["Emergency handling", "Surgical basics", "Decision making", "Ward management"],
+      ["Case presentation", "Patient management", "Diagnosis improvement", "Clinical reporting"],
+      ["Professional ethics", "Hospital workflow", "House job readiness", "Viva preparation"]
+    ],
+    practical: [
+      ["Anatomy lab", "Physiology lab", "Biochemistry lab", "Tutorials"],
+      ["Dissection", "Histology slides", "Lab records", "Group study"],
+      ["Pathology lab", "Pharmacology demos", "Microbiology lab", "Community visit"],
+      ["Forensic lab", "Case discussions", "Drug charts", "Public health work"],
+      ["Clinical ward visit", "Patient history", "Basic examination", "Skill lab"],
+      ["Ward rounds", "OPD observation", "Case files", "Clinical tutorials"],
+      ["ENT clinic", "Eye clinic", "Hospital rotation", "Patient observation"],
+      ["Emergency rotation", "Surgery ward", "Clinical case work", "Senior supervision"],
+      ["Full clinical rotation", "Case presentation", "Diagnosis practice", "Patient follow-up"],
+      ["Final ward practice", "House job prep", "Clinical viva", "Professional training"]
+    ],
+    outcomes: ["Medical Officer", "Doctor", "Specialist", "Surgeon"]
+  },
+
+  "BDS": {
+    main: "BDS",
+    base: "medical",
+    outcomes: ["Dentist", "Dental Surgeon", "Oral Health Specialist", "Clinic Owner"]
+  },
+
+  "DPT": {
+    main: "DPT",
+    base: "medical10",
+    outcomes: ["Physiotherapist", "Rehab Specialist", "Sports Therapist", "Clinical Therapist"]
+  },
+
+  "Pharm-D": {
+    main: "Pharm-D",
+    base: "medical10",
+    outcomes: ["Pharmacist", "Clinical Pharmacist", "Drug Inspector", "Pharma Industry Officer"]
+  },
+
+  "BBA": {
+    main: "BBA",
+    base: "business",
+    outcomes: ["Business Manager", "Entrepreneur", "Marketing Executive", "Business Analyst"]
+  },
+
+  "BS Accounting & Finance": {
+    main: "BS Accounting & Finance",
+    base: "finance",
+    outcomes: ["Accountant", "Finance Analyst", "Auditor", "Banking Officer"]
+  },
+
+  "BS Psychology": {
+    main: "BS Psychology",
+    base: "arts",
+    outcomes: ["Psychologist", "Counselor", "HR Assistant", "Research Assistant"]
+  },
+
+  "BS Media Studies": {
+    main: "BS Media Studies",
+    base: "arts",
+    outcomes: ["Media Officer", "Content Creator", "Journalist", "PR Officer"]
+  },
+
+  "BS English": {
+    main: "BS English",
+    base: "arts",
+    outcomes: ["Teacher", "Writer", "Editor", "Content Specialist"]
+  },
+
+  "BS Education": {
+    main: "BS Education",
+    base: "arts",
+    outcomes: ["Teacher", "Education Officer", "Curriculum Designer", "Academic Coordinator"]
+  },
+
+  "BS International Relations": {
+    main: "BS International Relations",
+    base: "arts",
+    outcomes: ["IR Analyst", "Research Officer", "Diplomacy Assistant", "Policy Analyst"]
   }
+};
 
-  if (p.includes("software") || p.includes("computer") || p.includes("cs") || p.includes("it")) {
-    return {
-      title: path || "Software Engineering",
-      subjects: [
-        ["Programming Fundamentals", "Mathematics I", "English Composition", "Applied Physics"],
-        ["Object Oriented Programming", "Discrete Mathematics", "Digital Logic", "Communication Skills"],
-        ["Data Structures", "Database Systems", "Computer Organization", "Probability & Statistics"],
-        ["Operating Systems", "Software Engineering", "Computer Networks", "Web Technologies"],
-        ["Mobile App Development", "AI Basics", "Human Computer Interaction", "Software Design"],
-        ["Machine Learning", "Cloud Computing", "Cyber Security", "Software Quality Assurance"],
-        ["Final Year Project I", "Project Management", "Research Methods", "Professional Practices"],
-        ["Final Year Project II", "Deployment", "Testing", "Entrepreneurship"],
+function getBaseRoadmap(base, main) {
+  const common = {
+    computing: {
+      semesters: [
+        ["Programming Fundamentals", "Calculus", "English", "ICT"],
+        ["OOP", "Discrete Mathematics", "Digital Logic", "Communication"],
+        ["Data Structures", "Database Systems", "Computer Organization", "Statistics"],
+        ["Algorithms", "Operating Systems", "Computer Networks", "Web Technologies"],
+        ["Software Engineering", "AI Basics", "HCI", "Theory of Automata"],
+        ["Cloud Computing", "Cyber Security", "Compiler Construction", "Research Methods"],
+        ["FYP I", "Project Management", "Advanced Elective", "Professional Practices"],
+        ["FYP II", "Deployment", "Testing", "Entrepreneurship"]
       ],
-      skills: ["Coding", "Problem solving", "Database handling", "Git/GitHub"],
-      practical: ["Console apps", "Web project", "Mobile app", "Final year project"],
-      outcomes: ["Software Engineer", "Web Developer", "Mobile App Developer", "AI/Data Assistant"],
-    };
-  }
+      skills: ["Programming", "Logic building", "Database", "Problem solving"],
+      practical: ["Coding labs", "Web project", "Database project", "Final year project"]
+    },
 
-  if (p.includes("data")) {
-    return {
-      title: "Data Science",
-      subjects: [
+    ai: {
+      semesters: [
+        ["Programming", "Mathematics I", "English", "ICT"],
+        ["OOP", "Statistics", "Discrete Math", "Digital Logic"],
+        ["Data Structures", "Linear Algebra", "Database", "Python"],
+        ["Machine Learning", "Algorithms", "Data Mining", "Computer Vision Basics"],
+        ["Deep Learning", "NLP", "AI Ethics", "Cloud Computing"],
+        ["Neural Networks", "MLOps Basics", "Robotics Basics", "Cyber Security"],
+        ["FYP I", "AI Project Design", "Research Methods", "Professional Practices"],
+        ["FYP II", "Model Deployment", "Testing", "Portfolio"]
+      ],
+      skills: ["Python", "ML basics", "Data handling", "Model training"],
+      practical: ["Prediction model", "AI chatbot", "Image classifier", "FYP"]
+    },
+
+    data: {
+      semesters: [
         ["Programming", "Statistics I", "Mathematics", "English"],
         ["Python for Data", "Probability", "Database Systems", "Data Visualization"],
         ["Data Structures", "Linear Algebra", "Business Analytics", "SQL"],
@@ -2948,37 +3097,14 @@ function fieldData(path) {
         ["Deep Learning", "Cloud Analytics", "AI Ethics", "Data Warehousing"],
         ["NLP Basics", "Predictive Analytics", "Dashboard Design", "Model Evaluation"],
         ["FYP I", "Advanced Analytics", "Project Management", "Professional Practices"],
-        ["FYP II", "Deployment", "Portfolio", "Internship"],
+        ["FYP II", "Deployment", "Portfolio", "Internship"]
       ],
       skills: ["Python", "SQL", "Data analysis", "Machine learning"],
-      practical: ["Data cleaning", "Dashboards", "ML mini projects", "Final project"],
-      outcomes: ["Data Analyst", "Data Scientist", "BI Analyst", "ML Assistant"],
-    };
-  }
+      practical: ["Data cleaning", "Dashboards", "ML projects", "Final project"]
+    },
 
-  if (p.includes("ai") || p.includes("artificial")) {
-    return {
-      title: "Artificial Intelligence",
-      subjects: [
-        ["Programming", "Mathematics I", "English", "Computer Basics"],
-        ["OOP", "Discrete Mathematics", "Statistics", "Digital Logic"],
-        ["Data Structures", "Linear Algebra", "Database Systems", "Python"],
-        ["Machine Learning", "Algorithms", "Computer Vision Basics", "Data Mining"],
-        ["Deep Learning", "NLP", "AI Ethics", "Cloud Computing"],
-        ["Robotics Basics", "Neural Networks", "MLOps Basics", "Cyber Security"],
-        ["FYP I", "AI Project Design", "Research Methods", "Professional Practices"],
-        ["FYP II", "Model Deployment", "Testing", "Portfolio"],
-      ],
-      skills: ["Python", "ML concepts", "Model training", "Data handling"],
-      practical: ["AI chatbot", "Prediction model", "Image classifier", "FYP"],
-      outcomes: ["AI Engineer", "ML Engineer", "Data Scientist", "AI Solution Assistant"],
-    };
-  }
-
-  if (p.includes("cyber")) {
-    return {
-      title: "Cyber Security",
-      subjects: [
+    cyber: {
+      semesters: [
         ["Programming", "Computer Basics", "Mathematics", "English"],
         ["Networking Basics", "OOP", "Digital Logic", "Discrete Math"],
         ["Operating Systems", "Database Systems", "Linux Basics", "Data Structures"],
@@ -2986,56 +3112,29 @@ function fieldData(path) {
         ["Digital Forensics", "Cloud Security", "Secure Coding", "Risk Management"],
         ["Penetration Testing", "Malware Analysis", "Security Audit", "Incident Response"],
         ["FYP I", "Security Project", "Research Methods", "Professional Practices"],
-        ["FYP II", "Security Testing", "Documentation", "Portfolio"],
+        ["FYP II", "Security Testing", "Documentation", "Portfolio"]
       ],
-      skills: ["Networking", "Linux", "Ethical hacking", "Security analysis"],
-      practical: ["Lab attacks", "Vulnerability testing", "Security reports", "FYP"],
-      outcomes: ["Cyber Security Analyst", "SOC Analyst", "Ethical Hacker", "Security Engineer"],
-    };
-  }
+      skills: ["Networking", "Linux", "Security testing", "Risk analysis"],
+      practical: ["Security labs", "Vulnerability testing", "Reports", "FYP"]
+    },
 
-  if (p.includes("engineering")) {
-    return {
-      title: path || "Engineering",
-      subjects: [
-        ["Engineering Drawing", "Calculus I", "Applied Physics", "English"],
-        ["Calculus II", "Basic Electronics", "Mechanics", "Workshop Practice"],
-        ["Engineering Materials", "Differential Equations", "Technical Writing", "Core Engineering I"],
-        ["Core Engineering II", "Thermodynamics / Circuits", "Statistics", "Engineering Design"],
-        ["Core Engineering III", "Project Management", "Numerical Methods", "Lab Work"],
-        ["Core Engineering IV", "Industrial Training", "Safety Engineering", "Design Project"],
-        ["FYP I", "Research Methods", "Professional Ethics", "Advanced Elective"],
-        ["FYP II", "Internship", "Final Design", "Presentation"],
-      ],
-      skills: ["Mathematics", "Design thinking", "Problem solving", "Technical drawing"],
-      practical: ["Lab work", "Workshop", "Design project", "FYP"],
-      outcomes: ["Engineer", "Project Engineer", "Design Engineer", "Site/Plant Engineer"],
-    };
-  }
-
-  if (p.includes("bba") || p.includes("business")) {
-    return {
-      title: "BBA",
-      subjects: [
+    business: {
+      semesters: [
         ["Principles of Management", "Economics", "Business English", "Computer Applications"],
-        ["Financial Accounting", "Marketing", "Business Mathematics", "Communication Skills"],
+        ["Financial Accounting", "Marketing", "Business Mathematics", "Communication"],
         ["HRM", "Business Statistics", "Cost Accounting", "Organizational Behavior"],
         ["Business Law", "Finance", "Consumer Behavior", "Entrepreneurship"],
         ["Operations Management", "Research Methods", "Digital Marketing", "Business Ethics"],
         ["Strategic Management", "International Business", "E-Commerce", "Leadership"],
         ["Internship", "Project Management", "Business Analytics", "Elective I"],
-        ["Final Project", "Business Policy", "Elective II", "Career Development"],
+        ["Final Project", "Business Policy", "Elective II", "Career Development"]
       ],
-      skills: ["Leadership", "Communication", "Finance basics", "Marketing"],
-      practical: ["Presentations", "Case studies", "Internship", "Business plan"],
-      outcomes: ["Manager", "Business Analyst", "Entrepreneur", "Marketing Executive"],
-    };
-  }
+      skills: ["Leadership", "Communication", "Marketing", "Finance basics"],
+      practical: ["Case studies", "Presentations", "Internship", "Business plan"]
+    },
 
-  if (p.includes("accounting") || p.includes("finance")) {
-    return {
-      title: "Accounting & Finance",
-      subjects: [
+    finance: {
+      semesters: [
         ["Financial Accounting", "Economics", "Business English", "Computer Basics"],
         ["Cost Accounting", "Business Mathematics", "Management", "Communication"],
         ["Corporate Accounting", "Statistics", "Business Law", "Taxation Basics"],
@@ -3043,78 +3142,173 @@ function fieldData(path) {
         ["Investment Analysis", "Risk Management", "Islamic Finance", "Research Methods"],
         ["Advanced Accounting", "Corporate Finance", "Portfolio Management", "ERP Basics"],
         ["Internship", "Financial Reporting", "Project Management", "Elective"],
-        ["Final Project", "Audit Practice", "Career Development", "Professional Ethics"],
+        ["Final Project", "Audit Practice", "Career Development", "Professional Ethics"]
       ],
-      skills: ["Excel", "Financial reporting", "Budgeting", "Analysis"],
-      practical: ["Balance sheets", "Reports", "Internship", "Final finance project"],
-      outcomes: ["Accountant", "Finance Analyst", "Auditor", "Banking Officer"],
-    };
-  }
+      skills: ["Excel", "Budgeting", "Financial reporting", "Analysis"],
+      practical: ["Balance sheets", "Reports", "Internship", "Finance project"]
+    },
 
-  if (p.includes("psychology")) {
-    return {
-      title: "Psychology",
-      subjects: [
-        ["Introduction to Psychology", "English", "Sociology", "Computer Basics"],
-        ["Developmental Psychology", "Statistics", "Communication", "Biological Psychology"],
-        ["Cognitive Psychology", "Research Methods", "Social Psychology", "Personality Theories"],
-        ["Abnormal Psychology", "Psychological Testing", "Counseling Basics", "Ethics"],
-        ["Clinical Psychology", "Educational Psychology", "Health Psychology", "Report Writing"],
-        ["Organizational Psychology", "Therapy Basics", "Assessment", "Case Studies"],
-        ["Internship", "Research Project I", "Advanced Counseling", "Elective"],
-        ["Research Project II", "Field Work", "Professional Practice", "Final Presentation"],
+    arts: {
+      semesters: [
+        ["Introduction to Field", "English", "Computer Basics", "Communication"],
+        ["Core Subject I", "Writing Skills", "Sociology", "Study Skills"],
+        ["Core Subject II", "Research Basics", "Presentation Skills", "Psychology / Society"],
+        ["Advanced Subject I", "Statistics Basics", "Ethics", "Field Practice"],
+        ["Specialization I", "Report Writing", "Professional Skills", "Elective I"],
+        ["Specialization II", "Research Methods", "Case Studies", "Elective II"],
+        ["Internship", "Research Project I", "Professional Practices", "Portfolio"],
+        ["Research Project II", "Field Work", "Final Presentation", "Career Development"]
       ],
-      skills: ["Listening", "Counseling basics", "Research", "Assessment"],
-      practical: ["Case studies", "Reports", "Internship", "Research project"],
-      outcomes: ["Psychologist", "Counselor", "HR Assistant", "Research Assistant"],
-    };
-  }
+      skills: ["Communication", "Research", "Writing", "Critical thinking"],
+      practical: ["Reports", "Case studies", "Internship", "Final project"]
+    },
 
+    medical: {
+      semesters: [
+        ["Anatomy", "Physiology", "Biochemistry", "English"],
+        ["Oral Anatomy / Core Medical II", "Histology", "Medical Ethics", "Communication"],
+        ["Pathology", "Pharmacology", "Microbiology", "Community Health"],
+        ["Clinical Subject I", "Clinical Subject II", "Diagnosis Basics", "Patient Care"],
+        ["Advanced Clinical I", "Treatment Planning", "Clinical Skills", "Case Studies"],
+        ["Advanced Clinical II", "Hospital Practice", "Professional Ethics", "Research"],
+        ["Clinical Rotation I", "Project Work", "Specialization Basics", "Internship"],
+        ["Clinical Rotation II", "Final Cases", "Viva Preparation", "Career Development"]
+      ],
+      skills: ["Patient handling", "Diagnosis basics", "Medical ethics", "Clinical communication"],
+      practical: ["Lab work", "Case studies", "Clinical practice", "Hospital rotation"]
+    },
+
+    medical10: {
+      semesters: [
+        ["Anatomy I", "Physiology I", "Biochemistry", "English"],
+        ["Anatomy II", "Physiology II", "Medical Terminology", "Communication"],
+        ["Pathology", "Pharmacology Basics", "Microbiology", "Community Health"],
+        ["Clinical Subject I", "Clinical Subject II", "Ethics", "Patient Care"],
+        ["Advanced Subject I", "Treatment Basics", "Clinical Skills", "Case Studies"],
+        ["Advanced Subject II", "Hospital Practice", "Research Methods", "Professional Ethics"],
+        ["Clinical Rotation I", "Specialization I", "Project Work", "Internship"],
+        ["Clinical Rotation II", "Specialization II", "Case Reports", "Field Practice"],
+        ["Advanced Clinical Training", "Patient Management", "Final Cases", "Professional Practice"],
+        ["Final Training", "Internship Completion", "Viva Preparation", "Career Development"]
+      ],
+      skills: ["Clinical skills", "Patient care", "Professional ethics", "Treatment planning"],
+      practical: ["Lab work", "Clinical rotation", "Case reports", "Internship"]
+    }
+  };
+
+  const selected = common[base] || common.arts;
   return {
-    title: path || "Selected Field",
-    subjects: [
-      ["Foundation Subject I", "Foundation Subject II", "English", "Computer Basics"],
-      ["Core Subject I", "Core Subject II", "Communication", "Mathematics / Logic"],
-      ["Core Subject III", "Research Basics", "Writing Skills", "Field Introduction"],
-      ["Advanced Subject I", "Practical Applications", "Statistics", "Ethics"],
-      ["Specialization I", "Professional Skills", "Project Work", "Elective I"],
-      ["Specialization II", "Research Methods", "Internship Preparation", "Elective II"],
-      ["FYP I", "Project Management", "Documentation", "Professional Practices"],
-      ["FYP II", "Presentation", "Portfolio", "Career Development"],
-    ],
-    skills: ["Communication", "Research", "Problem solving", "Teamwork"],
-    practical: ["Assignments", "Reports", "Mini projects", "Final project"],
-    outcomes: ["Professional in selected field", "Specialist", "Research Assistant", "Project Coordinator"],
+    main,
+    semesters: selected.semesters,
+    skills: selected.skills,
+    practical: selected.practical
   };
 }
 
+function findRoadmapData(path = "") {
+  const p = String(path || "").toLowerCase();
+
+  const aliases = {
+    "software": "BS Software Engineering",
+    "computer science": "BS Computer Science",
+    "cs": "BS Computer Science",
+    "artificial": "BS Artificial Intelligence",
+    "ai": "BS Artificial Intelligence",
+    "data": "BS Data Science",
+    "cyber": "BS Cyber Security",
+    "mbbs": "MBBS",
+    "bds": "BDS",
+    "dpt": "DPT",
+    "pharm": "Pharm-D",
+    "bba": "BBA",
+    "business": "BBA",
+    "accounting": "BS Accounting & Finance",
+    "finance": "BS Accounting & Finance",
+    "psychology": "BS Psychology",
+    "media": "BS Media Studies",
+    "english": "BS English",
+    "education": "BS Education",
+    "international": "BS International Relations"
+  };
+
+  let key = Object.keys(aliases).find((a) => p.includes(a));
+  let templateName = key ? aliases[key] : path;
+
+  let data = roadmapTemplates[templateName];
+
+  if (!data) {
+    data = {
+      main: path || "Selected Field",
+      base: "arts",
+      outcomes: [
+        "Professional in Selected Field",
+        "Specialist",
+        "Research Assistant",
+        "Project Coordinator"
+      ]
+    };
+  }
+
+  if (data.base) {
+    const baseData = getBaseRoadmap(data.base, data.main);
+    return {
+      ...data,
+      semesters: baseData.semesters,
+      skills: baseData.skills,
+      practical: baseData.practical
+    };
+  }
+
+  return data;
+}
+
+function getSemesterItems(items, index) {
+  if (Array.isArray(items[0])) return items[index] || items[items.length - 1];
+  return items;
+}
+
 function generateFallbackRoadmap(chosenPath, field, educationLevel) {
-  const data = fieldData(chosenPath || field || "General");
-  const semesters = getSemesterCount(chosenPath || field || "General");
+  const selected = chosenPath || field || "Selected Field";
+  const data = findRoadmapData(selected);
+  const totalSemesters = getSemesterCount(data.main || selected);
 
   let text = "";
 
-  for (let i = 1; i <= semesters; i++) {
-    const subjects = data.subjects[i - 1] || data.subjects[data.subjects.length - 1];
+  for (let i = 1; i <= totalSemesters; i++) {
+    const subjects = getSemesterItems(data.semesters, i - 1);
+    const skills = getSemesterItems(data.skills, i - 1);
+    const practical = getSemesterItems(data.practical, i - 1);
 
     text += `SEMESTER ${i}:\n`;
-    text += `- MAIN COURSE: ${data.title}\n`;
-    text += `- SUBJECTS: ${subjects.join(", ")}\n`;
-    text += `- SKILLS: ${data.skills.join(", ")}\n`;
-    text += `- PRACTICAL WORK: ${data.practical.join(", ")}\n\n`;
+    text += `- MAIN COURSE: ${data.main}\n`;
+    text += `- SUBJECTS: ${subjects.slice(0, 4).join(", ")}\n`;
+    text += `- SKILLS: ${skills.slice(0, 4).join(", ")}\n`;
+    text += `- PRACTICAL WORK: ${practical.slice(0, 4).join(", ")}\n\n`;
   }
 
   text += `CAREER OUTCOMES:\n`;
-  data.outcomes.forEach((item) => {
+  (data.outcomes || [
+    "Professional in selected field",
+    "Specialist",
+    "Research Assistant",
+    "Project Coordinator"
+  ]).forEach((item) => {
     text += `- ${item}\n`;
   });
 
   text += `\nNEXT STEP:\n`;
-  text += `- Focus on strong academics, practical skills, internships, and portfolio building.\n`;
+  text += `- Focus on academics, practical work, internship, portfolio, and admission eligibility.\n`;
 
   return text;
 }
 
+app.post("/roadmap", (req, res) => {
+  const { chosenPath, field, educationLevel } = req.body;
+
+  res.json({
+    roadmap: generateFallbackRoadmap(chosenPath, field, educationLevel),
+  });
+});
 app.post("/roadmap", (req, res) => {
    const { chosenPath, field, educationLevel } = req.body;
 

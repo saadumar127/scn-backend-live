@@ -82,19 +82,22 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   List<Map<String, dynamic>> _parseRoadmap(String text) {
     final sections = <Map<String, dynamic>>[];
 
-    final regex = RegExp(
-      r'(SEMESTER\s+\d+:|BRIDGE REQUIREMENT:|CAREER OUTCOMES:|NEXT STEP:)',
+    final semesterRegex = RegExp(
+      r'(SEMESTER\s+\d+(?:\s*-\s*\d+)?:|BRIDGE REQUIREMENT:|CAREER OUTCOMES:|NEXT STEP:)',
       caseSensitive: false,
     );
 
-    final matches = regex.allMatches(text).toList();
+    final semesterMatches = semesterRegex.allMatches(text).toList();
 
-    for (int i = 0; i < matches.length; i++) {
-      final end = i + 1 < matches.length ? matches[i + 1].start : text.length;
+    for (int i = 0; i < semesterMatches.length; i++) {
+      final end = i + 1 < semesterMatches.length
+          ? semesterMatches[i + 1].start
+          : text.length;
 
-      final title = matches[i].group(0)!.trim();
+      final title = semesterMatches[i].group(0)!.trim();
+
       final content = text
-          .substring(matches[i].end, end)
+          .substring(semesterMatches[i].end, end)
           .trim()
           .split('\n')
           .map((e) => e.trim())
@@ -106,6 +109,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         'items': content,
       });
     }
+
 
     return sections;
   }
@@ -338,7 +342,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   }
 
   Widget _roadmapItem(String item) {
-    final text = item.replaceAll('-', '').trim();
+    final text = item.replaceFirst(RegExp(r'^-\s*'), '').trim();
 
     if (!text.contains(':')) {
       return Padding(
@@ -536,7 +540,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Your AI Study Roadmap',
+                              'Your Study Roadmap',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 25,
@@ -559,7 +563,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                 ),
                 const SizedBox(height: 22),
                 const Text(
-                  'AI Generated Roadmap',
+                  'Smart Study Roadmap',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
