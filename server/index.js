@@ -31,8 +31,7 @@ const API_KEY = process.env.GEMINI_API_KEY;
 
 console.log("KEY LAST 6:", API_KEY?.slice(-6));
 
- const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-
+const GEMINI_URL =`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -2692,9 +2691,18 @@ ${message}
       console.error("Gemini Error:", err?.response?.data || err.message);
 
       // 🔥 Fallback reply (demo mode)
-      return res.json({
-        reply: "Gemini temporarily unavailable hai. Lekin main tumhari madad kar sakta hoon 🙂\n\nApna education level (Matric / Intermediate) aur field batao, main guide karta hoon."
-      });
+     return res.json({
+       reply: `Based on your message, here is a simple career guidance response:
+
+     For ${educationLevel || "your education level"} and ${selectedField || "your selected field"}, focus on:
+     1. Improving your academic marks
+     2. Learning practical skills
+     3. Exploring suitable degree programs
+     4. Building small projects or practical experience
+     5. Discussing options with teachers or career advisors
+
+     If you tell me your marks, field, and interests, I can suggest a better path.`
+     });
     }
 });
 
