@@ -2689,28 +2689,19 @@ ${message}
     res.json({ reply });
   }
 
- catch (err) {
-   console.log("Gemini Error:", err.response?.data || err.message);
+ return res.json({
+   reply: `SCN FALLBACK TEST 777
 
-   return res.json({
-     reply: `Gemini is temporarily unavailable, but I can still guide you.
+ Gemini API is currently blocked by region/location, but SCN backend is working.
 
- Based on your message, focus on these steps:
- 1. Tell me your education level: Matric or Intermediate
- 2. Tell me your field: Pre-Engineering, Pre-Medical, ICS, Commerce, or Arts
- 3. Share your marks percentage
- 4. I will suggest suitable career options, degree programs, and skills
+ Tell me:
+ 1. Your education level
+ 2. Your field
+ 3. Your marks
+ 4. Your interest
 
- For example, if you are in FSc Pre-Engineering with 57% marks, you can explore:
- - BS Computer Science
- - BS Software Engineering
- - BS Data Science
- - BS Information Technology
- - BS Cyber Security
-
- Focus on improving practical skills like programming, communication, problem solving, and portfolio building.`
-   });
- }
+ I will guide you with a fallback career response.`
+ });
 });
 
 /* -----------------------------------
