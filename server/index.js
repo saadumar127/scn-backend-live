@@ -2651,7 +2651,7 @@ app.get("/", (_req, res) => {
 /* -----------------------------------
    CHAT
 ----------------------------------- */
-
+console.log("CHAT FALLBACK VERSION 2");
 app.post("/chat", async (req, res) => {
   try {
     const { message, field, educationLevel, preferredLanguage } = req.body;
