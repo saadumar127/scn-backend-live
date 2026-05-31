@@ -2684,19 +2684,58 @@ ${message}
     console.log("Gemini Error:", err.response?.data || err.message);
 
     return res.json({
-      reply: `SCN FALLBACK TEST 777
+      reply: `I can guide you based on your education details.
 
-Gemini API is currently blocked by region/location, but SCN backend is working.
+    Please share:
+    1. Education Level (Matric / Intermediate)
+    2. Field (Pre-Medical, Pre-Engineering, ICS, Commerce, Arts)
+    3. Marks Percentage
+    4. Your Interests
 
-Tell me:
-1. Your education level
-2. Your field
-3. Your marks
-4. Your interest
+    Career Suggestions:
 
-I will guide you with a fallback career response.`
+    🔹 Pre-Medical:
+    • MBBS
+    • BDS
+    • DPT
+    • Pharm-D
+    • BS Nursing
+    • Biotechnology
+
+    🔹 Pre-Engineering:
+    • BS Software Engineering
+    • BS Computer Science
+    • BS Civil Engineering
+    • BS Electrical Engineering
+    • BS Mechanical Engineering
+    • BS Data Science
+
+    🔹 ICS:
+    • BS Computer Science
+    • BS Software Engineering
+    • BS Artificial Intelligence
+    • BS Data Science
+    • BS Cyber Security
+    • BS Information Technology
+
+    🔹 Commerce:
+    • BBA
+    • BS Accounting & Finance
+    • BS Economics
+    • BS Banking & Finance
+    • BS Commerce
+    • Business Analytics
+
+    🔹 Arts / FA:
+    • BS Psychology
+    • BS English
+    • BS Education
+    • BS Media Studies
+    • BS International Relations
+    • BS Sociology
+
+    Share your profile and I will recommend the most suitable career path, skills, and roadmap for you.`
     });
-  }
 });
 
 /* -----------------------------------
