@@ -2651,7 +2651,6 @@ app.get("/", (_req, res) => {
 /* -----------------------------------
    CHAT
 ----------------------------------- */
-console.log("CHAT FALLBACK VERSION 2");
 app.post("/chat", async (req, res) => {
   try {
     const { message, field, educationLevel, preferredLanguage } = req.body;
@@ -2671,37 +2670,31 @@ Instructions:
 - If user writes in Urdu, reply in Urdu.
 - If user writes in English, reply in English.
 - Guide the student according to their actual background.
-- Do not make the conversation only about engineering.
-- If student is from Pre-Medical, discuss medical and health paths.
-- If student is from ICS, discuss computing and technology paths.
-- If student is from ICOM, discuss business and finance paths.
-- If student is from FA, discuss humanities, education, media, psychology, and social sciences.
-- If student is from Pre-Engineering, discuss engineering and related technical paths.
 - Keep the answer practical, student-friendly, and specific.
-- Avoid generic repeated replies.
 
 User message:
 ${message}
 `;
 
     const reply = await askGeminiText(prompt);
+    return res.json({ reply });
+  } catch (err) {
+    console.log("Gemini Error:", err.response?.data || err.message);
 
-    res.json({ reply });
+    return res.json({
+      reply: `SCN FALLBACK TEST 777
+
+Gemini API is currently blocked by region/location, but SCN backend is working.
+
+Tell me:
+1. Your education level
+2. Your field
+3. Your marks
+4. Your interest
+
+I will guide you with a fallback career response.`
+    });
   }
-
- return res.json({
-   reply: `SCN FALLBACK TEST 777
-
- Gemini API is currently blocked by region/location, but SCN backend is working.
-
- Tell me:
- 1. Your education level
- 2. Your field
- 3. Your marks
- 4. Your interest
-
- I will guide you with a fallback career response.`
- });
 });
 
 /* -----------------------------------
