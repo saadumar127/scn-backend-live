@@ -34,7 +34,7 @@ console.log("KEY LAST 6:", API_KEY?.slice(-6));
 const GEMINI_URL =
 `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-on sleep(ms) {
+function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
