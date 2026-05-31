@@ -2687,23 +2687,30 @@ ${message}
     const reply = await askGeminiText(prompt);
 
     res.json({ reply });
-  } catch (err) {
-      console.error("Gemini Error:", err?.response?.data || err.message);
+  }
 
-      // 🔥 Fallback reply (demo mode)
-     return res.json({
-       reply: `Based on your message, here is a simple career guidance response:
+ catch (err) {
+   console.log("Gemini Error:", err.response?.data || err.message);
 
-     For ${educationLevel || "your education level"} and ${selectedField || "your selected field"}, focus on:
-     1. Improving your academic marks
-     2. Learning practical skills
-     3. Exploring suitable degree programs
-     4. Building small projects or practical experience
-     5. Discussing options with teachers or career advisors
+   return res.json({
+     reply: `Gemini is temporarily unavailable, but I can still guide you.
 
-     If you tell me your marks, field, and interests, I can suggest a better path.`
-     });
-    }
+ Based on your message, focus on these steps:
+ 1. Tell me your education level: Matric or Intermediate
+ 2. Tell me your field: Pre-Engineering, Pre-Medical, ICS, Commerce, or Arts
+ 3. Share your marks percentage
+ 4. I will suggest suitable career options, degree programs, and skills
+
+ For example, if you are in FSc Pre-Engineering with 57% marks, you can explore:
+ - BS Computer Science
+ - BS Software Engineering
+ - BS Data Science
+ - BS Information Technology
+ - BS Cyber Security
+
+ Focus on improving practical skills like programming, communication, problem solving, and portfolio building.`
+   });
+ }
 });
 
 /* -----------------------------------
