@@ -2654,89 +2654,82 @@ app.get("/", (_req, res) => {
    CHAT
 ----------------------------------- */
 app.post("/chat", async (req, res) => {
-  try {
-    const { message, field, educationLevel, preferredLanguage } = req.body;
-    const normalizedField = normalizeField(field || "General");
+   try {
+     const { message, field, educationLevel, preferredLanguage } = req.body;
+     const normalizedField = normalizeField(field || "General");
 
-    const prompt = `
-You are Smart Career Navigator AI, a student guidance assistant for Pakistan.
+     const prompt = `
+ You are Smart Career Navigator AI, a student guidance assistant for Pakistan.
 
-Student Context:
-- Education level: ${educationLevel || "Unknown"}
-- Current field/background: ${normalizedField}
-- Preferred language hint: ${preferredLanguage || "Auto detect"}
+ Student Context:
+ - Education level: ${educationLevel || "Unknown"}
+ - Current field/background: ${normalizedField}
+ - Preferred language hint: ${preferredLanguage || "Auto detect"}
 
-Instructions:
-- Reply in the same language as the user.
-- If user writes in Roman Urdu, reply in Roman Urdu.
-- If user writes in Urdu, reply in Urdu.
-- If user writes in English, reply in English.
-- Guide the student according to their actual background.
-- Keep the answer practical, student-friendly, and specific.
+ User message:
+ ${message}
+ `;
 
-User message:
-${message}
-`;
+     const reply = await askGeminiText(prompt);
+     return res.json({ reply });
+   } catch (err) {
+     console.log("Gemini Error:", err.response?.data || err.message);
 
-    const reply = await askGeminiText(prompt);
-    return res.json({ reply });
-  } catch (err) {
-    console.log("Gemini Error:", err.response?.data || err.message);
+     return res.json({
+       reply: `I can guide you based on your education details.
 
-    return res.json({
-      reply: `I can guide you based on your education details.
+ Please share:
+ 1. Education Level (Matric / Intermediate)
+ 2. Field (Pre-Medical, Pre-Engineering, ICS, Commerce, Arts)
+ 3. Marks Percentage
+ 4. Your Interests
 
-    Please share:
-    1. Education Level (Matric / Intermediate)
-    2. Field (Pre-Medical, Pre-Engineering, ICS, Commerce, Arts)
-    3. Marks Percentage
-    4. Your Interests
+ Career Suggestions:
 
-    Career Suggestions:
+ Pre-Medical:
+ - MBBS
+ - BDS
+ - DPT
+ - Pharm-D
+ - BS Nursing
+ - Biotechnology
 
-    🔹 Pre-Medical:
-    • MBBS
-    • BDS
-    • DPT
-    • Pharm-D
-    • BS Nursing
-    • Biotechnology
+ Pre-Engineering:
+ - BS Software Engineering
+ - BS Computer Science
+ - BS Civil Engineering
+ - BS Electrical Engineering
+ - BS Mechanical Engineering
+ - BS Data Science
 
-    🔹 Pre-Engineering:
-    • BS Software Engineering
-    • BS Computer Science
-    • BS Civil Engineering
-    • BS Electrical Engineering
-    • BS Mechanical Engineering
-    • BS Data Science
+ ICS:
+ - BS Computer Science
+ - BS Software Engineering
+ - BS Artificial Intelligence
+ - BS Data Science
+ - BS Cyber Security
+ - BS Information Technology
 
-    🔹 ICS:
-    • BS Computer Science
-    • BS Software Engineering
-    • BS Artificial Intelligence
-    • BS Data Science
-    • BS Cyber Security
-    • BS Information Technology
+ Commerce:
+ - BBA
+ - BS Accounting & Finance
+ - BS Economics
+ - BS Banking & Finance
+ - BS Commerce
+ - Business Analytics
 
-    🔹 Commerce:
-    • BBA
-    • BS Accounting & Finance
-    • BS Economics
-    • BS Banking & Finance
-    • BS Commerce
-    • Business Analytics
+ Arts / FA:
+ - BS Psychology
+ - BS English
+ - BS Education
+ - BS Media Studies
+ - BS International Relations
+ - BS Sociology
 
-    🔹 Arts / FA:
-    • BS Psychology
-    • BS English
-    • BS Education
-    • BS Media Studies
-    • BS International Relations
-    • BS Sociology
-
-    Share your profile and I will recommend the most suitable career path, skills, and roadmap for you.`
-    });
-});
+ Share your profile and I will recommend the most suitable career path, skills, and roadmap for you.`
+     });
+   }
+ });
 
 /* -----------------------------------
    QUIZ
