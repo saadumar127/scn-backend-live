@@ -2676,7 +2676,10 @@ app.post("/chat", async (req, res) => {
      console.log("Gemini Error:", err.response?.data || err.message);
 
      return res.json({
-       reply: `I can guide you based on your education details.
+       reply: `ℹ️ You are currently using SCN Guidance Mode.
+               General career guidance is available. For personalized
+               AI-powered recommendations, please complete the Career Assessment Quiz
+               and view your recommended career path..
 
  Please share:
  1. Education Level (Matric / Intermediate)
