@@ -71,9 +71,20 @@ function normalizeField(field) {
 /* -----------------------------------
    HELPERS
 ----------------------------------- */
+function normalizeMatricField(field = "") {
+  const f = String(field).toLowerCase();
+
+  if (f.includes("pre-engineering") || f.includes("engineering")) return "Pre-Engineering";
+  if (f.includes("ics") || f.includes("computer")) return "ICS";
+  if (f.includes("pre-medical") || f.includes("medical") || f.includes("biology")) return "Pre-Medical";
+  if (f.includes("icom") || f.includes("commerce")) return "ICOM";
+  if (f.includes("fa") || f.includes("arts")) return "FA";
+
+  return field || "ICS";
+}
 
 function generateMatricRoadmap(chosenPath, field, educationLevel) {
-  const selected = normalizeField(chosenPath || field || "ICS");
+const selected = normalizeMatricField(chosenPath || field || "ICS");
 
   const intermediateRoadmaps = {
     "ICS": {
