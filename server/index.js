@@ -72,16 +72,133 @@ function normalizeField(field) {
    HELPERS
 ----------------------------------- */
 
-function normalizeField(field = "") {
-  const f = String(field).toLowerCase();
+function generateMatricRoadmap(chosenPath, field, educationLevel) {
+  const selected = normalizeField(chosenPath || field || "ICS");
 
-  if (f.includes("pre-engineering") || f.includes("engineering")) return "Pre-Engineering";
-  if (f.includes("ics") || f.includes("computer")) return "ICS";
-  if (f.includes("pre-medical") || f.includes("medical") || f.includes("biology")) return "Pre-Medical";
-  if (f.includes("icom") || f.includes("commerce")) return "ICOM";
-  if (f.includes("fa") || f.includes("arts")) return "FA";
+  const intermediateRoadmaps = {
+    "ICS": {
+      main: "ICS",
+      year1: ["Computer Science", "Mathematics", "Physics", "English", "Urdu", "Islamiat"],
+      year2: ["Computer Science", "Mathematics", "Physics", "English", "Urdu", "Pakistan Studies"],
+      future: [
+        "BS Computer Science",
+        "BS Software Engineering",
+        "BS Artificial Intelligence",
+        "BS Cyber Security",
+        "BS Data Science",
+      ],
+      skills: [
+        "Programming Basics",
+        "Problem Solving",
+        "Computer Concepts",
+        "Mathematics",
+      ],
+    },
 
-  return field || "General";
+    "Pre-Medical": {
+      main: "Pre-Medical",
+      year1: ["Biology", "Chemistry", "Physics", "English", "Urdu", "Islamiat"],
+      year2: ["Biology", "Chemistry", "Physics", "English", "Urdu", "Pakistan Studies"],
+      future: [
+        "MBBS",
+        "BDS",
+        "DPT",
+        "Pharm-D",
+        "BS Nursing",
+        "Biotechnology",
+      ],
+      skills: [
+        "Biology Concepts",
+        "Medical Terminology",
+        "Laboratory Skills",
+        "Critical Thinking",
+      ],
+    },
+
+    "Pre-Engineering": {
+      main: "Pre-Engineering",
+      year1: ["Mathematics", "Physics", "Chemistry", "English", "Urdu", "Islamiat"],
+      year2: ["Mathematics", "Physics", "Chemistry", "English", "Urdu", "Pakistan Studies"],
+      future: [
+        "Civil Engineering",
+        "Electrical Engineering",
+        "Mechanical Engineering",
+        "Software Engineering",
+        "Architecture",
+      ],
+      skills: [
+        "Mathematics",
+        "Problem Solving",
+        "Physics",
+        "Engineering Thinking",
+      ],
+    },
+
+    "ICOM": {
+      main: "ICOM",
+      year1: ["Accounting", "Business Mathematics", "Economics", "English", "Urdu", "Islamiat"],
+      year2: ["Accounting", "Banking", "Economics", "English", "Urdu", "Pakistan Studies"],
+      future: [
+        "BBA",
+        "BS Accounting & Finance",
+        "BS Economics",
+        "BS Commerce",
+        "Banking & Finance",
+      ],
+      skills: [
+        "Accounting",
+        "Communication",
+        "Business Skills",
+        "Presentation Skills",
+      ],
+    },
+
+    "FA": {
+      main: "FA / Arts",
+      year1: ["English", "Urdu", "Islamic Studies", "Elective Subjects"],
+      year2: ["English", "Urdu", "Pakistan Studies", "Elective Subjects"],
+      future: [
+        "BS Psychology",
+        "BS English",
+        "BS Education",
+        "BS Media Studies",
+        "BS International Relations",
+      ],
+      skills: [
+        "Communication",
+        "Writing",
+        "Critical Thinking",
+        "Presentation Skills",
+      ],
+    },
+  };
+
+  const data = intermediateRoadmaps[selected] || intermediateRoadmaps["ICS"];
+
+  let text = "";
+
+  text += `INTERMEDIATE YEAR 1:\n`;
+  text += `- MAIN FIELD: ${data.main}\n`;
+  text += `- SUBJECTS: ${data.year1.join(", ")}\n`;
+  text += `- SKILLS: ${data.skills.join(", ")}\n`;
+  text += `- PRACTICAL WORK: Focus on classroom learning, assignments, quizzes, and concept building.\n\n`;
+
+  text += `INTERMEDIATE YEAR 2:\n`;
+  text += `- MAIN FIELD: ${data.main}\n`;
+  text += `- SUBJECTS: ${data.year2.join(", ")}\n`;
+  text += `- SKILLS: Board Exam Preparation, Entry Test Preparation, Career Planning\n`;
+  text += `- PRACTICAL WORK: Past papers, model papers, MCQs, and university admission preparation.\n\n`;
+
+  text += `FUTURE DEGREE OPTIONS:\n`;
+
+  data.future.forEach((item) => {
+    text += `- ${item}\n`;
+  });
+
+  text += `\nNEXT STEP:\n`;
+  text += `- Complete Intermediate with good marks and prepare for university admission according to your interests.\n`;
+
+  return text;
 }
 
 function shuffleArray(arr) {
@@ -3303,6 +3420,75 @@ function getSemesterItems(items, index) {
   return items;
 }
 
+function generateMatricRoadmap(chosenPath, field, educationLevel) {
+  const selected = chosenPath || field || "Recommended Intermediate Field";
+  const normalized = normalizeField(selected);
+
+  const intermediateRoadmaps = {
+    "ICS": {
+      main: "ICS",
+      year1: ["Computer Science", "Mathematics", "Physics", "English", "Urdu", "Islamiat"],
+      year2: ["Computer Science", "Mathematics", "Physics", "English", "Urdu", "Pakistan Studies"],
+      future: ["BS Computer Science", "BS Software Engineering", "BS Artificial Intelligence", "BS Cyber Security", "BS Data Science"],
+      skills: ["Programming basics", "Problem solving", "Basic computer concepts", "Mathematics practice"],
+    },
+    "Pre-Medical": {
+      main: "Pre-Medical",
+      year1: ["Biology", "Chemistry", "Physics", "English", "Urdu", "Islamiat"],
+      year2: ["Biology", "Chemistry", "Physics", "English", "Urdu", "Pakistan Studies"],
+      future: ["MBBS", "BDS", "DPT", "Pharm-D", "Biotechnology"],
+      skills: ["Biology concepts", "Chemistry practice", "Medical entry test preparation", "Time management"],
+    },
+    "Pre-Engineering": {
+      main: "Pre-Engineering",
+      year1: ["Mathematics", "Physics", "Chemistry", "English", "Urdu", "Islamiat"],
+      year2: ["Mathematics", "Physics", "Chemistry", "English", "Urdu", "Pakistan Studies"],
+      future: ["BS Civil Engineering", "BS Electrical Engineering", "BS Mechanical Engineering", "BS Software Engineering", "Architecture"],
+      skills: ["Mathematics practice", "Physics concepts", "Problem solving", "Entry test preparation"],
+    },
+    "ICOM": {
+      main: "ICOM",
+      year1: ["Accounting", "Business Mathematics", "Economics", "English", "Urdu", "Islamiat"],
+      year2: ["Accounting", "Banking", "Economics", "English", "Urdu", "Pakistan Studies"],
+      future: ["BBA", "BS Accounting & Finance", "BS Economics", "BS Banking & Finance", "Marketing"],
+      skills: ["Accounting basics", "Business concepts", "Communication skills", "Basic financial understanding"],
+    },
+    "FA": {
+      main: "FA / Arts",
+      year1: ["Civics / Education / Psychology", "English", "Urdu", "Islamic Studies", "Elective Subjects"],
+      year2: ["Civics / Education / Psychology", "English", "Urdu", "Pakistan Studies", "Elective Subjects"],
+      future: ["BS Psychology", "BS English", "BS Education", "BS Media Studies", "BS International Relations"],
+      skills: ["Writing skills", "Communication", "Critical thinking", "Presentation skills"],
+    },
+  };
+
+  const data = intermediateRoadmaps[normalized] || intermediateRoadmaps["ICS"];
+
+  let text = "";
+
+  text += `INTERMEDIATE YEAR 1:\n`;
+  text += `- MAIN FIELD: ${data.main}\n`;
+  text += `- SUBJECTS: ${data.year1.join(", ")}\n`;
+  text += `- SKILLS: ${data.skills.join(", ")}\n`;
+  text += `- PRACTICAL WORK: Focus on notes, assignments, tests, and basic concepts.\n\n`;
+
+  text += `INTERMEDIATE YEAR 2:\n`;
+  text += `- MAIN FIELD: ${data.main}\n`;
+  text += `- SUBJECTS: ${data.year2.join(", ")}\n`;
+  text += `- SKILLS: Board exam preparation, entry test preparation, career research\n`;
+  text += `- PRACTICAL WORK: Past papers, model papers, entry test MCQs, and university admission preparation.\n\n`;
+
+  text += `FUTURE DEGREE OPTIONS:\n`;
+  data.future.forEach((item) => {
+    text += `- ${item}\n`;
+  });
+
+  text += `\nNEXT STEP:\n`;
+  text += `- Complete Intermediate with strong marks, prepare for entry tests, and choose a university program according to your interest and performance.\n`;
+
+  return text;
+}
+
 function generateFallbackRoadmap(chosenPath, field, educationLevel) {
   const selected = chosenPath || field || "Selected Field";
   const data = findRoadmapData(selected);
@@ -3341,17 +3527,16 @@ function generateFallbackRoadmap(chosenPath, field, educationLevel) {
 app.post("/roadmap", (req, res) => {
   const { chosenPath, field, educationLevel } = req.body;
 
+  const level = String(educationLevel || "").toLowerCase();
+
+  const roadmap = level.includes("matric")
+    ? generateMatricRoadmap(chosenPath, field, educationLevel)
+    : generateFallbackRoadmap(chosenPath, field, educationLevel);
+
   res.json({
-    roadmap: generateFallbackRoadmap(chosenPath, field, educationLevel),
+    roadmap,
   });
 });
-app.post("/roadmap", (req, res) => {
-   const { chosenPath, field, educationLevel } = req.body;
-
-   res.json({
-     roadmap: generateFallbackRoadmap(chosenPath, field, educationLevel),
-   });
- });
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
