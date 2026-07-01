@@ -3458,15 +3458,22 @@ function generateFallbackRoadmap(chosenPath, field, educationLevel) {
 app.post("/roadmap", (req, res) => {
   const { chosenPath, field, educationLevel } = req.body;
 
+  console.log("ROADMAP BODY:", req.body);
+
   const level = String(educationLevel || "").toLowerCase();
 
-  const roadmap = level.includes("matric")
+  const isMatric =
+    level.includes("matric") ||
+    level.includes("school") ||
+    level.includes("10");
+
+  const roadmap = isMatric
     ? generateMatricRoadmap(chosenPath, field, educationLevel)
     : generateFallbackRoadmap(chosenPath, field, educationLevel);
 
-  res.json({
-    roadmap,
-  });
+  console.log("ROADMAP TYPE:", isMatric ? "MATRIC 2 YEAR" : "BS SEMESTER");
+
+  res.json({ roadmap });
 });
 const PORT = process.env.PORT || 3000;
 
