@@ -71,7 +71,7 @@ function normalizeField(field) {
 /* -----------------------------------
    HELPERS
 ----------------------------------- */
-function normalizeMatricField(field = "") {
+function normalizeField(field = "") {
   const f = String(field).toLowerCase();
 
   if (f.includes("pre-engineering") || f.includes("engineering")) return "Pre-Engineering";
@@ -84,7 +84,7 @@ function normalizeMatricField(field = "") {
 }
 
 function generateMatricRoadmap(chosenPath, field, educationLevel) {
-const selected = normalizeMatricField(chosenPath || field || "ICS");
+const selected = normalizeField(chosenPath || field || "ICS");
 
   const intermediateRoadmaps = {
     "ICS": {
